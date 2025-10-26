@@ -7,6 +7,7 @@ export const CHAIR_EDGE_CLEARANCE = 0.35;
 export const CHAIR_SIZE = 0.45;
 export const SNAP_STEP = 0.25;
 export const CONNECT_THRESHOLD = 0.2;
+export const CONNECT_ALIGNMENT_TOLERANCE = 0.3;
 export const AUTO_SAVE_MS = 10000;
 export const DEFAULT_TABLE_COUNT = 13;
 export const HEAD_SEATS_MIN = 2;

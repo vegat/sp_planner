@@ -1,4 +1,4 @@
-import { CHAIR_OFFSET, CONNECT_THRESHOLD, HEAD_SEATS_MAX, HEAD_SEATS_MIN, TABLE_LENGTH, TABLE_WIDTH } from '../core/constants.js';
+import { CHAIR_OFFSET, CONNECT_ALIGNMENT_TOLERANCE, CONNECT_THRESHOLD, HEAD_SEATS_MAX, HEAD_SEATS_MIN, TABLE_LENGTH, TABLE_WIDTH } from '../core/constants.js';
 import { Chair } from './Chair.js';
 import { clamp, normalizeRotation } from '../utils/math.js';
 import { tableHalfDimensionsForRotation, tableRectAt } from '../utils/geometry.js';
@@ -156,11 +156,11 @@ export class Table {
         const orientationB = Table.orientationFor(b);
         if (orientationA !== orientationB) return false;
         if (orientationA === 'horizontal') {
-            if (Math.abs(a.y - b.y) > 0.15) return false;
+            if (Math.abs(a.y - b.y) > CONNECT_ALIGNMENT_TOLERANCE) return false;
             const distance = Math.abs(a.x - b.x);
             return Math.abs(distance - TABLE_LENGTH) <= CONNECT_THRESHOLD;
         }
-        if (Math.abs(a.x - b.x) > 0.15) return false;
+        if (Math.abs(a.x - b.x) > CONNECT_ALIGNMENT_TOLERANCE) return false;
         const distance = Math.abs(a.y - b.y);
         return Math.abs(distance - TABLE_LENGTH) <= CONNECT_THRESHOLD;
     }
