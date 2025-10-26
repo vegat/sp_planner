@@ -143,10 +143,17 @@ body {
     justify-content: space-between;
     align-items: center;
     font-size: 0.95rem;
+    cursor: grab;
+    user-select: none;
 }
 
 .guest-list li.assigned {
     background: #d1fae5;
+}
+
+.guest-list li.dragging {
+    opacity: 0.6;
+    cursor: grabbing;
 }
 
 .guest-list li span.status {
@@ -199,6 +206,7 @@ body {
     background-color: #f8fafc;
     max-width: 100%;
     max-height: 100%;
+    user-select: none;
 }
 
 .planner-container.no-grid {
@@ -235,6 +243,11 @@ body {
     justify-content: center;
     text-align: center;
     overflow: hidden;
+}
+
+.table.selected {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35), 0 8px 16px rgba(15, 23, 42, 0.2);
 }
 
 .table.dragging {
@@ -331,6 +344,11 @@ body {
     color: #1f2933;
     cursor: pointer;
     transition: transform 0.1s, background 0.2s, border-color 0.2s;
+}
+
+.chair.drop-target {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
 }
 
 .chair.assigned {
@@ -450,6 +468,18 @@ body {
 #clearChair {
     background: #f1f5f9;
     color: #1f2933;
+}
+
+.selection-box {
+    position: absolute;
+    border: 2px dashed rgba(37, 99, 235, 0.85);
+    background: rgba(37, 99, 235, 0.15);
+    pointer-events: none;
+    z-index: 30;
+}
+
+.selection-box.hidden {
+    display: none;
 }
 
 @media (max-width: 1024px) {

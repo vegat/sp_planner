@@ -95,6 +95,17 @@
     const tableModalCancel = document.getElementById('tableModalCancel');
     const plannerSection = document.querySelector('.planner');
 
+    const selectedTables = new Set();
+    let selectionState = null;
+    let draggingGuestId = null;
+
+    const selectionBox = document.createElement('div');
+    selectionBox.id = 'selectionBox';
+    selectionBox.className = 'selection-box hidden';
+    if (plannerContainer) {
+        plannerContainer.appendChild(selectionBox);
+    }
+
     let chairContext = null;
     let tableContext = null;
     let autoSaveTimer = null;
@@ -120,6 +131,10 @@
 
     function deepCopy(value) {
         return JSON.parse(JSON.stringify(value));
+    }
+
+    function clamp(value, min, max) {
+        return Math.min(max, Math.max(min, value));
     }
 
     function pushHistory() {
@@ -168,6 +183,130 @@
 
     function normalizeRotation(rotation) {
         return Math.abs(rotation) % 180 === 90 ? 90 : 0;
+    }
+
+    function pointerPositionFromEvent(event) {
+        if (!plannerContainer) {
+            return {
+                px: { x: 0, y: 0 },
+                meters: { x: 0, y: 0 }
+            };
+        }
+        const rect = plannerContainer.getBoundingClientRect();
+        const pxX = clamp(event.clientX - rect.left, 0, rect.width || 1);
+        const pxY = clamp(event.clientY - rect.top, 0, rect.height || 1);
+        const metersX = pxX / SCALE;
+        const metersY = HALL_HEIGHT - pxY / SCALE;
+        return {
+            px: { x: pxX, y: pxY },
+            meters: { x: clamp(metersX, 0, HALL_WIDTH), y: clamp(metersY, 0, HALL_HEIGHT) }
+        };
+    }
+
+    function updateSelectionVisuals() {
+        if (!entitiesLayer) return;
+        const tableElements = entitiesLayer.querySelectorAll('.table');
+        tableElements.forEach(element => {
+            const tableId = element.dataset.tableId;
+            if (!tableId) return;
+            if (selectedTables.has(tableId)) {
+                element.classList.add('selected');
+            } else {
+                element.classList.remove('selected');
+            }
+        });
+    }
+
+    function clearSelection() {
+        if (!selectedTables.size) {
+            return;
+        }
+        selectedTables.clear();
+        updateSelectionVisuals();
+    }
+
+    function setSelection(ids) {
+        selectedTables.clear();
+        ids.forEach(id => selectedTables.add(id));
+        updateSelectionVisuals();
+    }
+
+    function updateSelectionBox() {
+        if (!selectionState || !selectionBox) return;
+        const left = Math.min(selectionState.startPx.x, selectionState.currentPx.x);
+        const top = Math.min(selectionState.startPx.y, selectionState.currentPx.y);
+        const width = Math.abs(selectionState.currentPx.x - selectionState.startPx.x);
+        const height = Math.abs(selectionState.currentPx.y - selectionState.startPx.y);
+        selectionBox.style.left = `${left}px`;
+        selectionBox.style.top = `${top}px`;
+        selectionBox.style.width = `${width}px`;
+        selectionBox.style.height = `${height}px`;
+    }
+
+    function onPlannerPointerDown(event) {
+        if (event.button !== 0) {
+            return;
+        }
+        if (event.target.closest('.table') || event.target.closest('.chair') || event.target.closest('.table-settings')) {
+            return;
+        }
+        if (!plannerContainer) {
+            return;
+        }
+        const { px, meters } = pointerPositionFromEvent(event);
+        selectionState = {
+            startPx: px,
+            currentPx: px,
+            startMeters: meters,
+            currentMeters: meters
+        };
+        if (selectionBox) {
+            selectionBox.classList.remove('hidden');
+            updateSelectionBox();
+        }
+        document.addEventListener('pointermove', onSelectionPointerMove);
+        document.addEventListener('pointerup', onSelectionPointerUp);
+    }
+
+    function onSelectionPointerMove(event) {
+        if (!selectionState) {
+            return;
+        }
+        event.preventDefault();
+        const { px, meters } = pointerPositionFromEvent(event);
+        selectionState.currentPx = px;
+        selectionState.currentMeters = meters;
+        updateSelectionBox();
+    }
+
+    function onSelectionPointerUp(event) {
+        if (!selectionState) {
+            return;
+        }
+        event.preventDefault();
+        document.removeEventListener('pointermove', onSelectionPointerMove);
+        document.removeEventListener('pointerup', onSelectionPointerUp);
+        if (selectionBox) {
+            selectionBox.classList.add('hidden');
+            selectionBox.style.width = '0px';
+            selectionBox.style.height = '0px';
+        }
+        const width = Math.abs(selectionState.currentPx.x - selectionState.startPx.x);
+        const height = Math.abs(selectionState.currentPx.y - selectionState.startPx.y);
+        if (width < 5 && height < 5) {
+            clearSelection();
+            selectionState = null;
+            return;
+        }
+        const minX = Math.min(selectionState.startMeters.x, selectionState.currentMeters.x);
+        const maxX = Math.max(selectionState.startMeters.x, selectionState.currentMeters.x);
+        const minY = Math.min(selectionState.startMeters.y, selectionState.currentMeters.y);
+        const maxY = Math.max(selectionState.startMeters.y, selectionState.currentMeters.y);
+        const ids = state.tables
+            .filter(tbl => tbl.x >= minX && tbl.x <= maxX && tbl.y >= minY && tbl.y <= maxY)
+            .map(tbl => tbl.id);
+        setSelection(ids);
+        selectionState = null;
     }
 
     function defaultHeadSeatCount(mode = (state && state.settings ? state.settings.mode : 'less')) {
@@ -224,6 +363,16 @@
         const spaceRight = HALL_WIDTH - rect.right;
         const spaceLeft = rect.left;
         return spaceRight <= spaceLeft ? 'right' : 'left';
+    }
+
+    function findChairById(chairId) {
+        for (const table of state.tables) {
+            const chair = table.chairs.find(c => c.id === chairId);
+            if (chair) {
+                return { table, chair };
+            }
+        }
+        return { table: null, chair: null };
     }
 
     function updateScale() {
@@ -502,37 +651,48 @@
         const { halfX, halfY } = tableHalfDimensionsForRotation(table.rotation || 0);
         const offset = orientation === 'horizontal' ? halfY + CHAIR_OFFSET : halfX + CHAIR_OFFSET;
         const side = chooseHeadSide(table);
-        const usableLength = orientation === 'horizontal'
-            ? Math.max(0, rect.right - rect.left - 0.3)
-            : Math.max(0, rect.bottom - rect.top - 0.3);
-        const step = seatCount > 1 ? usableLength / (seatCount - 1) : 0;
+        const axisStart = orientation === 'horizontal' ? rect.left + 0.15 : rect.top + 0.15;
+        const axisEnd = orientation === 'horizontal' ? rect.right - 0.15 : rect.bottom - 0.15;
+        const axisSpan = Math.max(0, axisEnd - axisStart);
+        const axisCenter = axisStart + axisSpan / 2;
+        let axisPositions;
+        if (seatCount === 1) {
+            axisPositions = [axisCenter];
+        } else if (seatCount === 2) {
+            const gap = Math.min(axisSpan / 3, 0.7);
+            axisPositions = [axisCenter - gap / 2, axisCenter + gap / 2];
+        } else if (seatCount === 3) {
+            const gap = Math.min(axisSpan / 6, 0.3);
+            axisPositions = [axisCenter - gap, axisCenter, axisCenter + gap];
+        } else {
+            const step = seatCount > 1 ? axisSpan / (seatCount - 1) : 0;
+            axisPositions = Array.from({ length: seatCount }, (_, index) => axisStart + index * step);
+        }
+        axisPositions = axisPositions.map(position => clamp(position, axisStart, axisEnd)).sort((a, b) => a - b);
         const prev = previousAssignments.get(table.id) || [];
         const newChairs = [];
-        for (let i = 0; i < seatCount; i++) {
+        axisPositions.forEach((coord, index) => {
+            const prevEntry = prev[index];
             if (orientation === 'horizontal') {
-                const x = rect.left + 0.15 + i * step;
                 const y = side === 'top' ? table.y + offset : table.y - offset;
-                const prevEntry = prev[i];
                 newChairs.push({
-                    id: `${table.id}_c${i + 1}`,
-                    x,
+                    id: `${table.id}_c${index + 1}`,
+                    x: coord,
                     y,
                     side,
                     guestId: prevEntry ? prevEntry.guestId : null
                 });
             } else {
-                const y = rect.top + 0.15 + i * step;
                 const x = side === 'right' ? table.x + offset : table.x - offset;
-                const prevEntry = prev[i];
                 newChairs.push({
-                    id: `${table.id}_c${i + 1}`,
+                    id: `${table.id}_c${index + 1}`,
                     x,
-                    y,
+                    y: coord,
                     side,
                     guestId: prevEntry ? prevEntry.guestId : null
                 });
             }
-        }
+        });
         if (prev.length > newChairs.length) {
             prev.slice(newChairs.length).forEach(item => {
                 if (item.guestId) {
@@ -677,6 +837,12 @@
 
     function renderTables() {
         entitiesLayer.innerHTML = '';
+        const existingIds = new Set(state.tables.map(table => table.id));
+        Array.from(selectedTables).forEach(id => {
+            if (!existingIds.has(id)) {
+                selectedTables.delete(id);
+            }
+        });
         state.tables.forEach(table => {
             const tableEl = document.createElement('div');
             tableEl.className = 'table';
@@ -687,6 +853,9 @@
             }
             if (table.isHead) {
                 tableEl.classList.add('table-head');
+            }
+            if (selectedTables.has(table.id)) {
+                tableEl.classList.add('selected');
             }
 
             const label = document.createElement('div');
@@ -734,6 +903,10 @@
                 chairEl.dataset.tableId = table.id;
                 chairEl.dataset.chairId = chair.id;
                 chairEl.addEventListener('click', onChairClick);
+                chairEl.addEventListener('dragover', onChairDragOver);
+                chairEl.addEventListener('dragenter', onChairDragEnter);
+                chairEl.addEventListener('dragleave', onChairDragLeave);
+                chairEl.addEventListener('drop', onChairDrop);
                 entitiesLayer.appendChild(chairEl);
             });
         });
@@ -767,6 +940,8 @@
             .sort((a, b) => a.name.localeCompare(b.name, 'pl'))
             .forEach(guest => {
                 const li = document.createElement('li');
+                li.dataset.guestId = guest.id;
+                li.draggable = true;
                 if (guest.assignedTo) {
                     li.classList.add('assigned');
                 }
@@ -777,6 +952,8 @@
                 status.textContent = guest.assignedTo ? 'przypisany' : 'wolny';
                 li.appendChild(nameSpan);
                 li.appendChild(status);
+                li.addEventListener('dragstart', onGuestDragStart);
+                li.addEventListener('dragend', onGuestDragEnd);
                 guestList.appendChild(li);
             });
     }
@@ -785,6 +962,7 @@
         renderTables();
         renderSummary();
         renderGuests();
+        updateSelectionVisuals();
     }
 
     function seatCountForTable(table) {
@@ -833,28 +1011,46 @@
         if (event.target.closest('.table-settings')) {
             return;
         }
+        if (!selectedTables.has(table.id)) {
+            setSelection([table.id]);
+        }
+        const tablesToMove = state.tables.filter(t => selectedTables.has(t.id));
+        if (!tablesToMove.length) {
+            tablesToMove.push(table);
+            setSelection([table.id]);
+        }
         event.preventDefault();
         pushHistory();
         const pointerId = event.pointerId;
         const startX = event.clientX;
         const startY = event.clientY;
-        const initialX = table.x;
-        const initialY = table.y;
+        const initialPositions = new Map();
         const originalChairPositions = new Map();
         const chairOffsets = new Map();
-        table.chairs.forEach(chair => {
-            originalChairPositions.set(chair.id, { x: chair.x, y: chair.y });
-            chairOffsets.set(chair.id, {
-                offsetX: chair.x - table.x,
-                offsetY: chair.y - table.y,
-                element: entitiesLayer.querySelector(`.chair[data-chair-id="${chair.id}"]`)
+        const tableElements = new Map();
+        tablesToMove.forEach(currentTable => {
+            initialPositions.set(currentTable.id, { x: currentTable.x, y: currentTable.y });
+            const tableElement = currentTable.id === table.id
+                ? event.currentTarget
+                : entitiesLayer.querySelector(`.table[data-table-id="${currentTable.id}"]`);
+            if (tableElement) {
+                tableElement.classList.add('dragging');
+                tableElements.set(currentTable.id, tableElement);
+            }
+            currentTable.chairs.forEach(chair => {
+                originalChairPositions.set(chair.id, { x: chair.x, y: chair.y });
+                chairOffsets.set(chair.id, {
+                    tableId: currentTable.id,
+                    offsetX: chair.x - currentTable.x,
+                    offsetY: chair.y - currentTable.y,
+                    element: entitiesLayer.querySelector(`.chair[data-chair-id="${chair.id}"]`)
+                });
             });
         });
-        const tableElement = event.currentTarget;
-        tableElement.classList.add('dragging');
-        if (tableElement.setPointerCapture) {
+        const primaryElement = tableElements.get(table.id) || event.currentTarget;
+        if (primaryElement.setPointerCapture) {
             try {
-                tableElement.setPointerCapture(pointerId);
+                primaryElement.setPointerCapture(pointerId);
             } catch (error) {
                 // ignore pointer capture errors
             }
@@ -862,10 +1058,12 @@
 
         const applyChairOffsets = () => {
             chairOffsets.forEach((info, chairId) => {
-                const chair = table.chairs.find(c => c.id === chairId);
+                const movingTable = state.tables.find(t => t.id === info.tableId);
+                if (!movingTable) return;
+                const chair = movingTable.chairs.find(c => c.id === chairId);
                 if (!chair) return;
-                chair.x = table.x + info.offsetX;
-                chair.y = table.y + info.offsetY;
+                chair.x = movingTable.x + info.offsetX;
+                chair.y = movingTable.y + info.offsetY;
                 if (info.element) {
                     positionChairElement(info.element, chair);
                 }
@@ -876,9 +1074,16 @@
             moveEvent.preventDefault();
             const deltaX = (moveEvent.clientX - startX) / SCALE;
             const deltaY = (moveEvent.clientY - startY) / SCALE;
-            table.x = initialX + deltaX;
-            table.y = initialY - deltaY;
-            positionTableElement(tableElement, table);
+            tablesToMove.forEach(currentTable => {
+                const initial = initialPositions.get(currentTable.id);
+                if (!initial) return;
+                currentTable.x = initial.x + deltaX;
+                currentTable.y = initial.y - deltaY;
+                const element = tableElements.get(currentTable.id);
+                if (element) {
+                    positionTableElement(element, currentTable);
+                }
+            });
             applyChairOffsets();
         };
 
@@ -886,36 +1091,77 @@
             upEvent.preventDefault();
             document.removeEventListener('pointermove', onMove);
             document.removeEventListener('pointerup', onUp);
-            if (tableElement.releasePointerCapture) {
+            const releaseElement = tableElements.get(table.id);
+            if (releaseElement && releaseElement.releasePointerCapture) {
                 try {
-                    tableElement.releasePointerCapture(pointerId);
+                    releaseElement.releasePointerCapture(pointerId);
                 } catch (error) {
                     // ignore release errors
                 }
             }
-            tableElement.classList.remove('dragging');
+            tableElements.forEach(element => {
+                element.classList.remove('dragging');
+            });
 
-            table.x = snap(table.x);
-            table.y = snap(table.y);
+            tablesToMove.forEach(currentTable => {
+                currentTable.x = snap(currentTable.x);
+                currentTable.y = snap(currentTable.y);
+            });
+            tablesToMove.forEach(currentTable => {
+                const element = tableElements.get(currentTable.id);
+                if (element) {
+                    positionTableElement(element, currentTable);
+                }
+            });
             applyChairOffsets();
 
-            const connection = findConnection(table);
-            if (connection) {
-                table.x = connection.x;
-                table.y = connection.y;
-                applyChairOffsets();
+            if (tablesToMove.length === 1) {
+                const single = tablesToMove[0];
+                const connection = findConnection(single);
+                if (connection) {
+                    single.x = connection.x;
+                    single.y = connection.y;
+                    const element = tableElements.get(single.id);
+                    if (element) {
+                        positionTableElement(element, single);
+                    }
+                    applyChairOffsets();
+                }
             }
 
-            if (!isPositionWithinHall(table.x, table.y, table.rotation) || collidesWithColumns(table.x, table.y, table.id, table.rotation) || collidesWithTables(table.x, table.y, table.id, table.rotation)) {
-                table.x = initialX;
-                table.y = initialY;
-                table.chairs.forEach(chair => {
-                    const original = originalChairPositions.get(chair.id);
-                    if (original) {
-                        chair.x = original.x;
-                        chair.y = original.y;
+            let invalid = false;
+            tablesToMove.forEach(currentTable => {
+                if (!isPositionWithinHall(currentTable.x, currentTable.y, currentTable.rotation) ||
+                    collidesWithColumns(currentTable.x, currentTable.y, currentTable.id, currentTable.rotation) ||
+                    collidesWithTables(currentTable.x, currentTable.y, currentTable.id, currentTable.rotation)) {
+                    invalid = true;
+                }
+            });
+
+            if (invalid) {
+                tablesToMove.forEach(currentTable => {
+                    const original = initialPositions.get(currentTable.id);
+                    if (!original) return;
+                    currentTable.x = original.x;
+                    currentTable.y = original.y;
+                    const element = tableElements.get(currentTable.id);
+                    if (element) {
+                        positionTableElement(element, currentTable);
                     }
                 });
+                originalChairPositions.forEach((position, chairId) => {
+                    const lookup = findChairById(chairId);
+                    if (lookup.chair) {
+                        lookup.chair.x = position.x;
+                        lookup.chair.y = position.y;
+                        const info = chairOffsets.get(chairId);
+                        if (info && info.element) {
+                            positionChairElement(info.element, lookup.chair);
+                        }
+                    }
+                });
+                updateSelectionVisuals();
+                return;
             }
 
             recomputeGroups(state);
@@ -967,6 +1213,87 @@
         chairGuestInput.focus();
     }
 
+    function onGuestDragStart(event) {
+        const guestId = event.currentTarget.dataset.guestId;
+        if (!guestId) return;
+        draggingGuestId = guestId;
+        if (event.dataTransfer) {
+            event.dataTransfer.effectAllowed = 'move';
+            try {
+                event.dataTransfer.setData('text/plain', guestId);
+            } catch (error) {
+                // ignore drag data errors
+            }
+        }
+        event.currentTarget.classList.add('dragging');
+    }
+
+    function onGuestDragEnd(event) {
+        if (event.currentTarget && event.currentTarget.classList) {
+            event.currentTarget.classList.remove('dragging');
+        }
+        draggingGuestId = null;
+    }
+
+    function onChairDragOver(event) {
+        const guestId = draggingGuestId || (event.dataTransfer && event.dataTransfer.getData('text/plain'));
+        if (!guestId) return;
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = 'move';
+        }
+    }
+
+    function onChairDragEnter(event) {
+        const guestId = draggingGuestId || (event.dataTransfer && event.dataTransfer.getData('text/plain'));
+        if (!guestId) return;
+        event.preventDefault();
+        event.currentTarget.classList.add('drop-target');
+    }
+
+    function onChairDragLeave(event) {
+        event.currentTarget.classList.remove('drop-target');
+    }
+
+    function assignGuestToChair(guestId, tableId, chairId) {
+        const guest = state.guests.find(g => g.id === guestId);
+        const table = state.tables.find(t => t.id === tableId);
+        if (!guest || !table) return;
+        const chair = table.chairs.find(c => c.id === chairId);
+        if (!chair) return;
+        if (guest.assignedTo === chair.id && chair.guestId === guest.id) {
+            return;
+        }
+        pushHistory();
+        if (guest.assignedTo && guest.assignedTo !== chair.id) {
+            const previous = findChairById(guest.assignedTo);
+            if (previous.chair) {
+                previous.chair.guestId = null;
+            }
+        }
+        if (chair.guestId && chair.guestId !== guest.id) {
+            const previousGuest = state.guests.find(g => g.id === chair.guestId);
+            if (previousGuest) {
+                previousGuest.assignedTo = null;
+            }
+        }
+        guest.assignedTo = chair.id;
+        chair.guestId = guest.id;
+        render();
+        persistLocal();
+    }
+
+    function onChairDrop(event) {
+        const guestId = draggingGuestId || (event.dataTransfer && event.dataTransfer.getData('text/plain'));
+        event.preventDefault();
+        event.currentTarget.classList.remove('drop-target');
+        if (!guestId) return;
+        const tableId = event.currentTarget.dataset.tableId;
+        const chairId = event.currentTarget.dataset.chairId;
+        assignGuestToChair(guestId, tableId, chairId);
+        draggingGuestId = null;
+    }
+
     function closeChairModal() {
         chairModal.classList.add('hidden');
         chairGuestInput.value = '';
@@ -987,6 +1314,10 @@
             closeTableModal();
         }
     });
+
+    if (plannerContainer) {
+        plannerContainer.addEventListener('pointerdown', onPlannerPointerDown);
+    }
 
     tableHeadCheckbox.addEventListener('change', () => {
         const table = tableContext ? state.tables.find(t => t.id === tableContext) : null;
