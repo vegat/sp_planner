@@ -161,7 +161,7 @@ export class PlannerState {
             });
             previousAssignments.set(newTable.id, (table.chairs || []).map(chair => ({
                 id: chair.id,
-                guestId: chair.guest ?? chair.guestId || null
+                guestId: chair.guest ?? chair.guestId ?? null
             })));
             return newTable;
         });

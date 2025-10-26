@@ -7,6 +7,7 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
     <meta charset="UTF-8">
     <title>Planer układu sali</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' ry='8' fill='%232b1b0f'/%3E%3Ctext x='32' y='40' font-size='32' text-anchor='middle' fill='%23f2d2a9' font-family='Arial,Helvetica,sans-serif'%3ESP%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="css/base.css">
     <link rel="stylesheet" href="css/layout.css">
     <link rel="stylesheet" href="css/components.css">
