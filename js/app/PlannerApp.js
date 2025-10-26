@@ -329,8 +329,11 @@ export class PlannerApp {
         }
         this.dragContext.tables.forEach((table, index) => {
             const candidate = candidates[index];
-            table.x = candidate.x;
-            table.y = candidate.y;
+            const deltaX = candidate.x - table.x;
+            const deltaY = candidate.y - table.y;
+            if (deltaX || deltaY) {
+                table.moveBy(deltaX, deltaY);
+            }
         });
         this.renderTablesOnly();
     }

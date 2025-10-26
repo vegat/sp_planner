@@ -215,10 +215,11 @@ export class PlannerState {
             for (let j = i + 1; j < this.tables.length; j++) {
                 const a = this.tables[i];
                 const b = this.tables[j];
-                if (Table.shouldConnect(a, b)) {
+                const connection = Table.connectionBetween(a, b);
+                if (connection) {
                     adjacency.get(a.id).add(b.id);
                     adjacency.get(b.id).add(a.id);
-                    Table.alignTables(a, b);
+                    Table.alignTables(a, b, connection);
                 }
             }
         }

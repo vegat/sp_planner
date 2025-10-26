@@ -43,13 +43,14 @@ export class Table {
         });
     }
 
-    setPosition(x, y) {
-        this.x = x;
-        this.y = y;
-    }
-
     setRotation(rotation) {
         this.rotation = normalizeRotation(rotation);
+    }
+
+    moveBy(deltaX, deltaY) {
+        this.x += deltaX;
+        this.y += deltaY;
+        this.chairs.forEach(chair => chair.moveBy(deltaX, deltaY));
     }
 
     setDescription(description) {
@@ -150,36 +151,63 @@ export class Table {
         return tableRectAt(table.x, table.y, table.rotation || 0);
     }
 
-    static shouldConnect(a, b) {
-        if (a.isHead || b.isHead) return false;
+    static connectionBetween(a, b) {
+        if (a.isHead || b.isHead) return null;
         const orientationA = Table.orientationFor(a);
         const orientationB = Table.orientationFor(b);
-        if (orientationA !== orientationB) return false;
+        if (orientationA !== orientationB) return null;
+        const dx = Math.abs(a.x - b.x);
+        const dy = Math.abs(a.y - b.y);
         if (orientationA === 'horizontal') {
-            if (Math.abs(a.y - b.y) > CONNECT_ALIGNMENT_TOLERANCE) return false;
-            const distance = Math.abs(a.x - b.x);
-            return Math.abs(distance - TABLE_LENGTH) <= CONNECT_THRESHOLD;
+            if (dy <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dx - TABLE_LENGTH) <= CONNECT_THRESHOLD) {
+                return { orientation: 'horizontal', type: 'length' };
+            }
+            if (dx <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dy - TABLE_WIDTH) <= CONNECT_THRESHOLD) {
+                return { orientation: 'horizontal', type: 'width' };
+            }
+            return null;
         }
-        if (Math.abs(a.x - b.x) > CONNECT_ALIGNMENT_TOLERANCE) return false;
-        const distance = Math.abs(a.y - b.y);
-        return Math.abs(distance - TABLE_LENGTH) <= CONNECT_THRESHOLD;
+        if (dx <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dy - TABLE_LENGTH) <= CONNECT_THRESHOLD) {
+            return { orientation: 'vertical', type: 'length' };
+        }
+        if (dy <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dx - TABLE_WIDTH) <= CONNECT_THRESHOLD) {
+            return { orientation: 'vertical', type: 'width' };
+        }
+        return null;
     }
 
-    static alignTables(a, b) {
-        const orientation = Table.orientationFor(a);
-        if (orientation !== Table.orientationFor(b)) {
+    static shouldConnect(a, b) {
+        return Boolean(Table.connectionBetween(a, b));
+    }
+
+    static alignTables(a, b, connection = Table.connectionBetween(a, b)) {
+        if (!connection) {
             return;
         }
+        const { orientation, type } = connection;
         if (orientation === 'horizontal') {
-            const avgY = (a.y + b.y) / 2;
-            a.y = avgY;
-            b.y = avgY;
-            if (a.x < b.x) {
-                a.x = b.x - TABLE_LENGTH;
+            if (type === 'length') {
+                const avgY = (a.y + b.y) / 2;
+                a.y = avgY;
+                b.y = avgY;
+                if (a.x < b.x) {
+                    a.x = b.x - TABLE_LENGTH;
+                } else {
+                    a.x = b.x + TABLE_LENGTH;
+                }
             } else {
-                a.x = b.x + TABLE_LENGTH;
+                const avgX = (a.x + b.x) / 2;
+                a.x = avgX;
+                b.x = avgX;
+                if (a.y < b.y) {
+                    a.y = b.y - TABLE_WIDTH;
+                } else {
+                    a.y = b.y + TABLE_WIDTH;
+                }
             }
-        } else {
+            return;
+        }
+        if (type === 'length') {
             const avgX = (a.x + b.x) / 2;
             a.x = avgX;
             b.x = avgX;
@@ -187,6 +215,15 @@ export class Table {
                 a.y = b.y - TABLE_LENGTH;
             } else {
                 a.y = b.y + TABLE_LENGTH;
+            }
+        } else {
+            const avgY = (a.y + b.y) / 2;
+            a.y = avgY;
+            b.y = avgY;
+            if (a.x < b.x) {
+                a.x = b.x - TABLE_WIDTH;
+            } else {
+                a.x = b.x + TABLE_WIDTH;
             }
         }
     }

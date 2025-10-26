@@ -8,6 +8,11 @@ export class Chair {
         this.guestId = guestId;
     }
 
+    moveBy(deltaX, deltaY) {
+        this.x += deltaX;
+        this.y += deltaY;
+    }
+
     assignGuest(guestId) {
         this.guestId = guestId;
     }
