@@ -1,0 +1,20 @@
+:root {
+    --scale: 40;
+    --table-length: 2.3;
+    --table-width: 1.0;
+    --chair-size: 0.45;
+    --chair-radius: 0.05;
+    --chair-offset: 0.4;
+    --grid-spacing: 0.5;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: "Inter", "Segoe UI", sans-serif;
+    background: #f5f7fa;
+    color: #1f2933;
+}
