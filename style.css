@@ -418,6 +418,16 @@ body {
     width: auto;
 }
 
+.modal .conditional-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.modal .conditional-field.hidden {
+    display: none;
+}
+
 .modal-actions {
     display: flex;
     gap: 0.5rem;

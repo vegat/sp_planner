@@ -89,6 +89,14 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
                     <input type="checkbox" id="tableHead">
                     <span>Stół prezydialny (krzesła po jednej stronie)</span>
                 </label>
+                <div class="conditional-field hidden" id="tableHeadSeatsField">
+                    <label for="tableHeadSeats">Liczba miejsc przy stole prezydialnym</label>
+                    <select id="tableHeadSeats">
+                        <option value="2">2 miejsca</option>
+                        <option value="3">3 miejsca</option>
+                        <option value="4">4 miejsca</option>
+                    </select>
+                </div>
                 <div class="modal-actions">
                     <button type="submit">Zapisz</button>
                     <button type="button" id="tableModalCancel">Anuluj</button>

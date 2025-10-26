@@ -9,6 +9,9 @@
     const SNAP_STEP = 0.25;
     const CONNECT_THRESHOLD = 0.2;
     const AUTO_SAVE_MS = 10000;
+    const DEFAULT_TABLE_COUNT = 13;
+    const HEAD_SEATS_MIN = 2;
+    const HEAD_SEATS_MAX = 4;
     const LOCAL_STORAGE_KEY = 'stara_podkowa_planer_state_v1';
 
     const hallPolygon = [
@@ -34,6 +37,25 @@
         { from: { x: 8, y: 11 }, to: { x: 14, y: 11 }, label: 'Brama na łąkę' },
         { from: { x: 16, y: 11 }, to: { x: 22, y: 11 }, label: 'Przeszklona brama' },
         { from: { x: 11.5, y: 0 }, to: { x: 13.5, y: 0 }, label: 'Wejście' }
+    ];
+
+    const defaultLayoutBlueprint = [
+        { x: 12.5, y: 9.6, rotation: 0, isHead: true, headSeatCount: 4 },
+        { x: 7.5, y: 7.6, rotation: 0 },
+        { x: 12.5, y: 7.6, rotation: 0 },
+        { x: 17.5, y: 7.6, rotation: 0 },
+        { x: 21.5, y: 7.6, rotation: 0 },
+        { x: 7.5, y: 5.4, rotation: 0 },
+        { x: 12.5, y: 5.4, rotation: 0 },
+        { x: 17.5, y: 5.4, rotation: 0 },
+        { x: 21.5, y: 5.4, rotation: 0 },
+        { x: 7.5, y: 3.0, rotation: 0 },
+        { x: 12.5, y: 3.0, rotation: 0 },
+        { x: 17.5, y: 3.0, rotation: 0 },
+        { x: 21.5, y: 3.0, rotation: 0 },
+        { x: 7.5, y: 1.1, rotation: 0 },
+        { x: 17.5, y: 1.1, rotation: 0 },
+        { x: 21.5, y: 1.1, rotation: 0 }
     ];
 
     const plannerContainer = document.getElementById('plannerContainer');
@@ -67,6 +89,8 @@
     const tableDescriptionInput = document.getElementById('tableDescription');
     const tableRotationSelect = document.getElementById('tableRotation');
     const tableHeadCheckbox = document.getElementById('tableHead');
+    const tableHeadSeatsField = document.getElementById('tableHeadSeatsField');
+    const tableHeadSeatsSelect = document.getElementById('tableHeadSeats');
     const tableModalClose = document.getElementById('tableModalClose');
     const tableModalCancel = document.getElementById('tableModalCancel');
     const plannerSection = document.querySelector('.planner');
@@ -84,12 +108,12 @@
 
     function createEmptyState() {
         return {
-            version: 3,
+            version: 4,
             tables: [],
             guests: [],
             settings: {
                 mode: 'less',
-                tableCount: 4
+                tableCount: DEFAULT_TABLE_COUNT
             }
         };
     }
@@ -146,6 +170,17 @@
         return Math.abs(rotation) % 180 === 90 ? 90 : 0;
     }
 
+    function defaultHeadSeatCount(mode = (state && state.settings ? state.settings.mode : 'less')) {
+        return mode === 'more' ? HEAD_SEATS_MAX : Math.min(HEAD_SEATS_MAX, 3);
+    }
+
+    function clampHeadSeatCount(value, mode = (state && state.settings ? state.settings.mode : 'less')) {
+        if (!Number.isFinite(value)) {
+            return defaultHeadSeatCount(mode);
+        }
+        return Math.min(HEAD_SEATS_MAX, Math.max(HEAD_SEATS_MIN, Math.round(value)));
+    }
+
     function tableHalfDimensionsForRotation(rotation) {
         const normalized = normalizeRotation(rotation || 0);
         if (normalized === 90) {
@@ -184,11 +219,11 @@
         if (orientation === 'horizontal') {
             const spaceTop = HALL_HEIGHT - rect.bottom;
             const spaceBottom = rect.top;
-            return spaceTop >= spaceBottom ? 'top' : 'bottom';
+            return spaceTop <= spaceBottom ? 'top' : 'bottom';
         }
         const spaceRight = HALL_WIDTH - rect.right;
         const spaceLeft = rect.left;
-        return spaceRight >= spaceLeft ? 'right' : 'left';
+        return spaceRight <= spaceLeft ? 'right' : 'left';
     }
 
     function updateScale() {
@@ -266,26 +301,30 @@
 
     function computeDefaultTables(count) {
         const positions = [];
-        const rows = [2.2, 4.2, 6.2, 8.2];
-        const maxCols = 4;
-        const spacingX = TABLE_LENGTH + 1.2;
-        const startX = 11.8;
-        for (let row of rows) {
-            for (let col = 0; col < maxCols; col++) {
-                if (positions.length >= count) {
-                    break;
-                }
-                const x = startX + col * spacingX;
-                const candidate = { x, y: row, rotation: 0 };
-                if (isPositionWithinHall(candidate.x, candidate.y, candidate.rotation) && !collidesWithColumns(candidate.x, candidate.y, null, candidate.rotation) && !defaultWouldCollide(candidate, positions)) {
-                    positions.push(candidate);
-                }
-            }
+        for (const entry of defaultLayoutBlueprint) {
             if (positions.length >= count) {
                 break;
             }
+            const candidate = {
+                x: entry.x,
+                y: entry.y,
+                rotation: normalizeRotation(entry.rotation || 0),
+                isHead: Boolean(entry.isHead),
+                headSeatCount: clampHeadSeatCount(entry.headSeatCount ?? defaultHeadSeatCount('less'), 'less')
+            };
+            if (isPositionWithinHall(candidate.x, candidate.y, candidate.rotation) && !collidesWithColumns(candidate.x, candidate.y, null, candidate.rotation) && !defaultWouldCollide(candidate, positions)) {
+                positions.push(candidate);
+            }
         }
-        return positions;
+        let attempts = 0;
+        while (positions.length < count && attempts < 200) {
+            const fallback = findFreeSpot(positions);
+            if (!defaultWouldCollide(fallback, positions) && isPositionWithinHall(fallback.x, fallback.y, fallback.rotation) && !collidesWithColumns(fallback.x, fallback.y, null, fallback.rotation)) {
+                positions.push(fallback);
+            }
+            attempts++;
+        }
+        return positions.slice(0, count);
     }
 
     function defaultWouldCollide(candidate, placed) {
@@ -304,8 +343,9 @@
                 number: index + 1,
                 x: pos.x,
                 y: pos.y,
-                rotation: 0,
-                isHead: false,
+                rotation: pos.rotation || 0,
+                isHead: Boolean(pos.isHead),
+                headSeatCount: clampHeadSeatCount(pos.headSeatCount ?? defaultHeadSeatCount(newState.settings.mode), newState.settings.mode),
                 description: '',
                 chairs: [],
                 groupId: tableId
@@ -410,6 +450,7 @@
     }
 
     function tablesShouldConnect(a, b) {
+        if (a.isHead || b.isHead) return false;
         const orientationA = tableOrientation(a);
         const orientationB = tableOrientation(b);
         if (orientationA !== orientationB) return false;
@@ -453,6 +494,55 @@
         }
     }
 
+    function updateHeadTableChairs(table, previousAssignments, removedGuests, mode) {
+        const seatCount = clampHeadSeatCount(table.headSeatCount ?? defaultHeadSeatCount(mode), mode);
+        table.headSeatCount = seatCount;
+        const orientation = tableOrientation(table);
+        const rect = tableRectFor(table);
+        const { halfX, halfY } = tableHalfDimensionsForRotation(table.rotation || 0);
+        const offset = orientation === 'horizontal' ? halfY + CHAIR_OFFSET : halfX + CHAIR_OFFSET;
+        const side = chooseHeadSide(table);
+        const usableLength = orientation === 'horizontal'
+            ? Math.max(0, rect.right - rect.left - 0.3)
+            : Math.max(0, rect.bottom - rect.top - 0.3);
+        const step = seatCount > 1 ? usableLength / (seatCount - 1) : 0;
+        const prev = previousAssignments.get(table.id) || [];
+        const newChairs = [];
+        for (let i = 0; i < seatCount; i++) {
+            if (orientation === 'horizontal') {
+                const x = rect.left + 0.15 + i * step;
+                const y = side === 'top' ? table.y + offset : table.y - offset;
+                const prevEntry = prev[i];
+                newChairs.push({
+                    id: `${table.id}_c${i + 1}`,
+                    x,
+                    y,
+                    side,
+                    guestId: prevEntry ? prevEntry.guestId : null
+                });
+            } else {
+                const y = rect.top + 0.15 + i * step;
+                const x = side === 'right' ? table.x + offset : table.x - offset;
+                const prevEntry = prev[i];
+                newChairs.push({
+                    id: `${table.id}_c${i + 1}`,
+                    x,
+                    y,
+                    side,
+                    guestId: prevEntry ? prevEntry.guestId : null
+                });
+            }
+        }
+        if (prev.length > newChairs.length) {
+            prev.slice(newChairs.length).forEach(item => {
+                if (item.guestId) {
+                    removedGuests.add(item.guestId);
+                }
+            });
+        }
+        table.chairs = newChairs;
+    }
+
     function recomputeChairs(currentState) {
         const groups = new Map();
         currentState.tables.forEach(table => {
@@ -476,80 +566,86 @@
             if (!tablesInGroup.length) {
                 return;
             }
-            const orientation = tableOrientation(tablesInGroup[0]);
-            const sorted = tablesInGroup
-                .slice()
-                .sort((a, b) => orientation === 'horizontal' ? a.x - b.x : a.y - b.y);
-            const firstRect = tableRectFor(sorted[0]);
-            const lastRect = tableRectFor(sorted[sorted.length - 1]);
-            const groupStart = orientation === 'horizontal' ? firstRect.left : firstRect.top;
-            const groupEnd = orientation === 'horizontal' ? lastRect.right : lastRect.bottom;
-            const usableLength = Math.max(0, groupEnd - groupStart - 0.3);
-            const connections = Math.max(0, sorted.length - 1);
-            const chairsPerSide = basePerSide * sorted.length + connections;
-            const step = chairsPerSide > 1 ? usableLength / (chairsPerSide - 1) : 0;
-            const centerCoordinate = orientation === 'horizontal'
-                ? sorted.reduce((sum, t) => sum + t.y, 0) / sorted.length
-                : sorted.reduce((sum, t) => sum + t.x, 0) / sorted.length;
-            const offset = orientation === 'horizontal'
-                ? tableHalfDimensionsForRotation(sorted[0].rotation).halfY + CHAIR_OFFSET
-                : tableHalfDimensionsForRotation(sorted[0].rotation).halfX + CHAIR_OFFSET;
+            const normalTables = tablesInGroup.filter(table => !table.isHead);
+            if (normalTables.length) {
+                const orientation = tableOrientation(normalTables[0]);
+                const sorted = normalTables
+                    .slice()
+                    .sort((a, b) => orientation === 'horizontal' ? a.x - b.x : a.y - b.y);
+                const firstRect = tableRectFor(sorted[0]);
+                const lastRect = tableRectFor(sorted[sorted.length - 1]);
+                const groupStart = orientation === 'horizontal' ? firstRect.left : firstRect.top;
+                const groupEnd = orientation === 'horizontal' ? lastRect.right : lastRect.bottom;
+                const usableLength = Math.max(0, groupEnd - groupStart - 0.3);
+                const connections = Math.max(0, sorted.length - 1);
+                const chairsPerSide = basePerSide * sorted.length + connections;
+                const step = chairsPerSide > 1 ? usableLength / (chairsPerSide - 1) : 0;
+                const centerCoordinate = orientation === 'horizontal'
+                    ? sorted.reduce((sum, t) => sum + t.y, 0) / sorted.length
+                    : sorted.reduce((sum, t) => sum + t.x, 0) / sorted.length;
+                const offset = orientation === 'horizontal'
+                    ? tableHalfDimensionsForRotation(sorted[0].rotation).halfY + CHAIR_OFFSET
+                    : tableHalfDimensionsForRotation(sorted[0].rotation).halfX + CHAIR_OFFSET;
 
-            const positionsPrimary = [];
-            const positionsSecondary = [];
-            for (let i = 0; i < chairsPerSide; i++) {
-                if (orientation === 'horizontal') {
-                    const x = groupStart + 0.15 + i * step;
-                    positionsPrimary.push({ x, y: centerCoordinate + offset, side: 'top', order: i });
-                    positionsSecondary.push({ x, y: centerCoordinate - offset, side: 'bottom', order: i });
-                } else {
-                    const y = groupStart + 0.15 + i * step;
-                    positionsPrimary.push({ x: centerCoordinate + offset, y, side: 'right', order: i });
-                    positionsSecondary.push({ x: centerCoordinate - offset, y, side: 'left', order: i });
-                }
-            }
-            const allPositions = [...positionsPrimary, ...positionsSecondary];
-            const sideOrder = orientation === 'horizontal'
-                ? { top: 0, bottom: 1 }
-                : { left: 0, right: 1 };
-
-            sorted.forEach(table => {
-                const rect = tableRectFor(table);
-                const relevant = allPositions.filter(pos => {
+                const positionsPrimary = [];
+                const positionsSecondary = [];
+                for (let i = 0; i < chairsPerSide; i++) {
                     if (orientation === 'horizontal') {
-                        return pos.x >= rect.left - 1e-6 && pos.x <= rect.right + 1e-6;
+                        const x = groupStart + 0.15 + i * step;
+                        positionsPrimary.push({ x, y: centerCoordinate + offset, side: 'top', order: i });
+                        positionsSecondary.push({ x, y: centerCoordinate - offset, side: 'bottom', order: i });
+                    } else {
+                        const y = groupStart + 0.15 + i * step;
+                        positionsPrimary.push({ x: centerCoordinate + offset, y, side: 'right', order: i });
+                        positionsSecondary.push({ x: centerCoordinate - offset, y, side: 'left', order: i });
                     }
-                    return pos.y >= rect.top - 1e-6 && pos.y <= rect.bottom + 1e-6;
-                });
-                const allowedSides = table.isHead ? [chooseHeadSide(table)] : null;
-                const filtered = allowedSides ? relevant.filter(pos => allowedSides.includes(pos.side)) : relevant;
-                filtered.sort((a, b) => {
-                    const orderA = sideOrder[a.side] ?? 0;
-                    const orderB = sideOrder[b.side] ?? 0;
-                    if (orderA !== orderB) {
-                        return orderA - orderB;
-                    }
-                    return a.order - b.order;
-                });
-                const prev = previousAssignments.get(table.id) || [];
-                const newChairs = filtered.map((pos, index) => {
-                    const prevEntry = prev[index];
-                    return {
-                        id: `${table.id}_c${index + 1}`,
-                        x: pos.x,
-                        y: pos.y,
-                        side: pos.side,
-                        guestId: prevEntry ? prevEntry.guestId : null
-                    };
-                });
-                if (prev.length > newChairs.length) {
-                    prev.slice(newChairs.length).forEach(item => {
-                        if (item.guestId) {
-                            removedGuests.add(item.guestId);
-                        }
-                    });
                 }
-                table.chairs = newChairs;
+                const allPositions = [...positionsPrimary, ...positionsSecondary];
+                const sideOrder = orientation === 'horizontal'
+                    ? { top: 0, bottom: 1 }
+                    : { left: 0, right: 1 };
+
+                sorted.forEach(table => {
+                    const rect = tableRectFor(table);
+                    const relevant = allPositions.filter(pos => {
+                        if (orientation === 'horizontal') {
+                            return pos.x >= rect.left - 1e-6 && pos.x <= rect.right + 1e-6;
+                        }
+                        return pos.y >= rect.top - 1e-6 && pos.y <= rect.bottom + 1e-6;
+                    });
+                    relevant.sort((a, b) => {
+                        const orderA = sideOrder[a.side] ?? 0;
+                        const orderB = sideOrder[b.side] ?? 0;
+                        if (orderA !== orderB) {
+                            return orderA - orderB;
+                        }
+                        return a.order - b.order;
+                    });
+                    const prev = previousAssignments.get(table.id) || [];
+                    const newChairs = relevant.map((pos, index) => {
+                        const prevEntry = prev[index];
+                        return {
+                            id: `${table.id}_c${index + 1}`,
+                            x: pos.x,
+                            y: pos.y,
+                            side: pos.side,
+                            guestId: prevEntry ? prevEntry.guestId : null
+                        };
+                    });
+                    if (prev.length > newChairs.length) {
+                        prev.slice(newChairs.length).forEach(item => {
+                            if (item.guestId) {
+                                removedGuests.add(item.guestId);
+                            }
+                        });
+                    }
+                    table.chairs = newChairs;
+                });
+            }
+
+            const headTables = tablesInGroup.filter(table => table.isHead);
+            headTables.forEach(table => {
+                updateHeadTableChairs(table, previousAssignments, removedGuests, mode);
             });
         });
 
@@ -691,6 +787,24 @@
         renderGuests();
     }
 
+    function seatCountForTable(table) {
+        const mode = state.settings ? state.settings.mode : 'less';
+        if (table && Number.isFinite(table.headSeatCount)) {
+            return clampHeadSeatCount(table.headSeatCount, mode);
+        }
+        return clampHeadSeatCount(defaultHeadSeatCount(mode), mode);
+    }
+
+    function updateHeadSeatField(table) {
+        if (!tableHeadSeatsField || !tableHeadSeatsSelect) return;
+        const isHead = tableHeadCheckbox.checked;
+        tableHeadSeatsField.classList.toggle('hidden', !isHead);
+        tableHeadSeatsSelect.disabled = !isHead;
+        if (isHead) {
+            tableHeadSeatsSelect.value = String(seatCountForTable(table));
+        }
+    }
+
     function openTableModal(tableId) {
         const table = state.tables.find(t => t.id === tableId);
         if (!table) return;
@@ -698,6 +812,10 @@
         tableDescriptionInput.value = table.description || '';
         tableRotationSelect.value = String(normalizeRotation(table.rotation || 0));
         tableHeadCheckbox.checked = Boolean(table.isHead);
+        if (tableHeadSeatsSelect) {
+            tableHeadSeatsSelect.value = String(seatCountForTable(table));
+        }
+        updateHeadSeatField(table);
         tableModal.classList.remove('hidden');
         tableDescriptionInput.focus();
     }
@@ -870,6 +988,11 @@
         }
     });
 
+    tableHeadCheckbox.addEventListener('change', () => {
+        const table = tableContext ? state.tables.find(t => t.id === tableContext) : null;
+        updateHeadSeatField(table);
+    });
+
     document.addEventListener('keydown', event => {
         if (event.key === 'Escape') {
             if (!chairModal.classList.contains('hidden')) {
@@ -947,6 +1070,8 @@
         const description = tableDescriptionInput.value.trim();
         const rotation = normalizeRotation(Number(tableRotationSelect.value));
         const isHead = tableHeadCheckbox.checked;
+        const requestedSeatCount = tableHeadSeatsSelect ? Number(tableHeadSeatsSelect.value) : NaN;
+        const seatCount = clampHeadSeatCount(Number.isFinite(requestedSeatCount) ? requestedSeatCount : seatCountForTable(table), state.settings.mode);
         const rotationChanged = rotation !== table.rotation;
         if (rotationChanged) {
             const fits = isPositionWithinHall(table.x, table.y, rotation) && !collidesWithColumns(table.x, table.y, table.id, rotation) && !collidesWithTables(table.x, table.y, table.id, rotation);
@@ -955,7 +1080,9 @@
                 return;
             }
         }
-        if (description === (table.description || '') && rotation === table.rotation && isHead === Boolean(table.isHead)) {
+        const currentSeatCount = seatCountForTable(table);
+        const seatChanged = seatCount !== currentSeatCount;
+        if (description === (table.description || '') && rotation === table.rotation && isHead === Boolean(table.isHead) && !seatChanged) {
             closeTableModal();
             return;
         }
@@ -963,6 +1090,7 @@
         table.description = description;
         table.rotation = rotation;
         table.isHead = isHead;
+        table.headSeatCount = seatCount;
         recomputeGroups(state);
         recomputeChairs(state);
         applyRemovedGuestFallback();
@@ -1116,31 +1244,52 @@
         const defaultPositions = computeDefaultTables(state.tables.length + 1);
         let position = defaultPositions[state.tables.length];
         if (!position) {
-            position = findFreeSpot();
+            position = findFreeSpot(state.tables, 0, state.settings.mode);
         }
         state.tables.push({
             id: newId,
             number: state.tables.length + 1,
             x: position.x,
             y: position.y,
-            rotation: 0,
-            isHead: false,
+            rotation: position.rotation || 0,
+            isHead: Boolean(position.isHead),
+            headSeatCount: clampHeadSeatCount(position.headSeatCount ?? defaultHeadSeatCount(state.settings.mode), state.settings.mode),
             description: '',
             chairs: [],
             groupId: newId
         });
     }
 
-    function findFreeSpot() {
-        const rotation = 0;
+    function findFreeSpot(existing = state.tables, rotation = 0, mode = state.settings ? state.settings.mode : 'less') {
         for (let x = 11.5; x <= 23; x += 0.5) {
             for (let y = 1.5; y <= 9.5; y += 0.5) {
-                if (isPositionWithinHall(x, y, rotation) && !collidesWithColumns(x, y, null, rotation) && !collidesWithTables(x, y, null, rotation)) {
-                    return { x, y };
+                if (!isPositionWithinHall(x, y, rotation) || collidesWithColumns(x, y, null, rotation)) {
+                    continue;
+                }
+                const candidateRect = tableRectAt(x, y, rotation);
+                const collision = existing.some(table => {
+                    const rot = table.rotation || 0;
+                    const rect = tableRectAt(table.x, table.y, rot);
+                    return rectanglesIntersect(candidateRect, rect);
+                });
+                if (!collision) {
+                    return {
+                        x,
+                        y,
+                        rotation,
+                        isHead: false,
+                        headSeatCount: clampHeadSeatCount(defaultHeadSeatCount(mode), mode)
+                    };
                 }
             }
         }
-        return { x: 12, y: 2 };
+        return {
+            x: 12,
+            y: 2,
+            rotation,
+            isHead: false,
+            headSeatCount: clampHeadSeatCount(defaultHeadSeatCount(mode), mode)
+        };
     }
 
     function removeTables(count) {
@@ -1183,7 +1332,10 @@
     }
 
     function persistLocal() {
-        state.version = 3;
+        if (state && state.settings) {
+            state.settings.tableCount = state.tables.length;
+        }
+        state.version = 4;
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
     }
 
@@ -1231,8 +1383,26 @@
         const sourceVersion = data.version || 1;
         const needsFlip = sourceVersion < 2;
         state.settings = data.settings || state.settings;
+        if (!state.settings.mode) {
+            state.settings.mode = 'less';
+        }
+        const mode = state.settings && state.settings.mode ? state.settings.mode : 'less';
         state.tables = (data.tables || []).map((table, index) => {
             const rotation = normalizeRotation(table.rotation || 0);
+            const rawSeatCount = typeof table.headSeatCount === 'number'
+                ? table.headSeatCount
+                : typeof table.headSeatCount === 'string'
+                    ? Number(table.headSeatCount)
+                    : NaN;
+            const derivedSeatCount = Array.isArray(table.chairs) && table.isHead ? table.chairs.length : undefined;
+            const seatCount = clampHeadSeatCount(
+                Number.isFinite(rawSeatCount)
+                    ? rawSeatCount
+                    : (typeof derivedSeatCount === 'number' && derivedSeatCount > 0
+                        ? derivedSeatCount
+                        : defaultHeadSeatCount(mode)),
+                mode
+            );
             const mapped = {
                 id: table.id || `t${index + 1}`,
                 number: table.number || index + 1,
@@ -1240,6 +1410,7 @@
                 y: needsFlip && typeof table.y === 'number' ? HALL_HEIGHT - table.y : table.y,
                 rotation,
                 isHead: Boolean(table.isHead),
+                headSeatCount: seatCount,
                 description: table.description || '',
                 chairs: Array.isArray(table.chairs) ? table.chairs.map((chair, chairIndex) => ({
                     id: chair.id || `${table.id || `t${index + 1}`}_c${chairIndex + 1}`,
@@ -1255,7 +1426,9 @@
             }
             return mapped;
         });
-        state.version = 3;
+        const resolvedTableCount = state.tables.length || state.settings.tableCount || DEFAULT_TABLE_COUNT;
+        state.settings.tableCount = resolvedTableCount;
+        state.version = 4;
         state.guests = Array.isArray(data.guests) ? data.guests.map(guest => ({
             id: guest.id || `g${guest.name}`,
             name: guest.name,
@@ -1293,7 +1466,7 @@
             if (local) {
                 hydrateState(local);
             } else {
-                state = createDefaultState(4);
+                state = createDefaultState(DEFAULT_TABLE_COUNT);
             }
         }
         render();
