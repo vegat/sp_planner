@@ -74,6 +74,28 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
             </form>
         </div>
     </div>
+    <div id="tableModal" class="modal hidden">
+        <div class="modal-content">
+            <button type="button" class="modal-close" id="tableModalClose">×</button>
+            <form id="tableForm">
+                <label for="tableDescription">Opis stołu</label>
+                <textarea id="tableDescription" placeholder="Opcjonalny opis stołu"></textarea>
+                <label for="tableRotation">Orientacja stołu</label>
+                <select id="tableRotation">
+                    <option value="0">Poziomo (dłuższy bok w poziomie)</option>
+                    <option value="90">Pionowo (dłuższy bok w pionie)</option>
+                </select>
+                <label class="checkbox-field">
+                    <input type="checkbox" id="tableHead">
+                    <span>Stół prezydialny (krzesła po jednej stronie)</span>
+                </label>
+                <div class="modal-actions">
+                    <button type="submit">Zapisz</button>
+                    <button type="button" id="tableModalCancel">Anuluj</button>
+                </div>
+            </form>
+        </div>
+    </div>
     <script src="script.js" defer></script>
 </body>
 </html>

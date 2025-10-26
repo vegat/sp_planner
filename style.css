@@ -169,10 +169,11 @@ body {
 .planner {
     flex: 1;
     display: flex;
-    align-items: stretch;
+    align-items: center;
     justify-content: center;
     padding: 1.5rem;
     overflow: auto;
+    min-height: 0;
 }
 
 .planner-container {
@@ -196,6 +197,8 @@ body {
     width: calc(25 * var(--scale) * 1px);
     height: calc(11 * var(--scale) * 1px);
     background-color: #f8fafc;
+    max-width: 100%;
+    max-height: 100%;
 }
 
 .planner-container.no-grid {
@@ -227,6 +230,11 @@ body {
     box-shadow: 0 4px 8px rgba(15, 23, 42, 0.15);
     cursor: grab;
     transition: box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
 }
 
 .table.dragging {
@@ -236,27 +244,62 @@ body {
 }
 
 .table-label {
-    position: absolute;
-    top: -1.5rem;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(37, 56, 88, 0.9);
-    color: #fff;
-    padding: 0.3rem 0.6rem;
-    border-radius: 999px;
-    font-size: 0.75rem;
-    white-space: nowrap;
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: center;
+    justify-content: center;
+    background: rgba(37, 56, 88, 0.08);
+    color: #1f2933;
+    padding: 0.25rem 0.5rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
     pointer-events: none;
+    max-width: calc(100% - 2rem);
+    word-break: break-word;
 }
 
-.table-description {
-    position: absolute;
-    bottom: 0.2rem;
-    left: 50%;
-    transform: translateX(-50%);
+.table-label-title {
+    font-weight: 600;
+    font-size: 0.82rem;
+}
+
+.table-label-subtitle {
     font-size: 0.7rem;
-    color: #364fc7;
-    pointer-events: none;
+    color: #475569;
+}
+
+.table-head {
+    border-color: #fb923c;
+    background: #fff7ed;
+}
+
+.table-head .table-label {
+    background: rgba(251, 146, 60, 0.15);
+    color: #9a3412;
+}
+
+.table-settings {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    border: none;
+    background: rgba(37, 56, 88, 0.15);
+    color: #1f2933;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+}
+
+.table-settings:hover {
+    background: rgba(37, 56, 88, 0.3);
+    transform: scale(1.05);
 }
 
 .pillar {
@@ -336,6 +379,45 @@ body {
     cursor: pointer;
 }
 
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal form label {
+    font-size: 0.85rem;
+    color: #1f2933;
+}
+
+.modal form input[type="text"],
+.modal form textarea,
+.modal form select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #cbd2d9;
+    font: inherit;
+    color: #1f2933;
+}
+
+.modal form textarea {
+    resize: vertical;
+    min-height: 3.5rem;
+}
+
+.modal .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #1f2933;
+}
+
+.modal .checkbox-field input {
+    width: auto;
+}
+
 .modal-actions {
     display: flex;
     gap: 0.5rem;
@@ -375,8 +457,4 @@ body {
         padding: 1rem;
     }
 
-    .planner-container {
-        transform: scale(0.9);
-        transform-origin: top left;
-    }
 }
