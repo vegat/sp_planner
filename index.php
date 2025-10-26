@@ -7,7 +7,10 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
     <meta charset="UTF-8">
     <title>Planer układu sali</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="css/base.css">
+    <link rel="stylesheet" href="css/layout.css">
+    <link rel="stylesheet" href="css/components.css">
+    <link rel="stylesheet" href="css/modals.css">
 </head>
 <body>
     <div class="app">
@@ -104,6 +107,6 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
             </form>
         </div>
     </div>
-    <script src="script.js" defer></script>
+    <script type="module" src="js/main.js"></script>
 </body>
 </html>
