@@ -38,6 +38,8 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
                 <section>
                     <h2>Podsumowanie</h2>
                     <p>Stoły: <span id="summaryTables">0</span></p>
+                    <p>Miejsca łącznie: <span id="summarySeatsTotal">0</span></p>
+                    <p>Miejsca wolne: <span id="summarySeatsFree">0</span></p>
                     <p>Goście przypisani: <span id="summaryAssigned">0</span></p>
                     <p>Goście wolni: <span id="summaryUnassigned">0</span></p>
                 </section>

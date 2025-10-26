@@ -2,6 +2,8 @@
     const SCALE = 40;
     const TABLE_LENGTH = 2.3;
     const TABLE_WIDTH = 1.0;
+    const HALL_WIDTH = 25;
+    const HALL_HEIGHT = 11;
     const CHAIR_OFFSET = 0.4;
     const CHAIR_SIZE = 0.45;
     const SNAP_STEP = 0.25;
@@ -14,9 +16,9 @@
         { x: 4.3, y: 0 },
         { x: 4.3, y: 2.3 },
         { x: 0, y: 5.3 },
-        { x: 0, y: 11 },
-        { x: 25, y: 11 },
-        { x: 25, y: 0 },
+        { x: 0, y: HALL_HEIGHT },
+        { x: HALL_WIDTH, y: HALL_HEIGHT },
+        { x: HALL_WIDTH, y: 0 },
         { x: 0, y: 0 }
     ];
 
@@ -46,6 +48,8 @@
     const resetBtn = document.getElementById('resetBtn');
     const shareBtn = document.getElementById('shareBtn');
     const summaryTables = document.getElementById('summaryTables');
+    const summarySeatsTotal = document.getElementById('summarySeatsTotal');
+    const summarySeatsFree = document.getElementById('summarySeatsFree');
     const summaryAssigned = document.getElementById('summaryAssigned');
     const summaryUnassigned = document.getElementById('summaryUnassigned');
     const guestForm = document.getElementById('guestForm');
@@ -71,7 +75,7 @@
 
     function createEmptyState() {
         return {
-            version: 1,
+            version: 2,
             tables: [],
             guests: [],
             settings: {
@@ -125,12 +129,26 @@
         return value * SCALE;
     }
 
+    function toScreenY(value) {
+        return metersToPixels(HALL_HEIGHT - value);
+    }
+
+    function positionTableElement(tableElement, table) {
+        tableElement.style.left = `${metersToPixels(table.x - TABLE_LENGTH / 2)}px`;
+        tableElement.style.top = `${metersToPixels(HALL_HEIGHT - table.y - TABLE_WIDTH / 2)}px`;
+    }
+
+    function positionChairElement(chairElement, chair) {
+        chairElement.style.left = `${metersToPixels(chair.x - CHAIR_SIZE / 2)}px`;
+        chairElement.style.top = `${metersToPixels(HALL_HEIGHT - chair.y - CHAIR_SIZE / 2)}px`;
+    }
+
     function renderHall() {
-        hallSvg.setAttribute('viewBox', `0 0 ${metersToPixels(25)} ${metersToPixels(11)}`);
+        hallSvg.setAttribute('viewBox', `0 0 ${metersToPixels(HALL_WIDTH)} ${metersToPixels(HALL_HEIGHT)}`);
         hallSvg.innerHTML = '';
 
         const hallPath = document.createElementNS('http://www.w3.org/2000/svg', 'polygon');
-        hallPath.setAttribute('points', hallPolygon.map(p => `${metersToPixels(p.x)},${metersToPixels(p.y)}`).join(' '));
+        hallPath.setAttribute('points', hallPolygon.map(p => `${metersToPixels(p.x)},${toScreenY(p.y)}`).join(' '));
         hallPath.setAttribute('fill', '#e0f2fe');
         hallPath.setAttribute('stroke', '#1d4ed8');
         hallPath.setAttribute('stroke-width', '2');
@@ -139,7 +157,7 @@
         pillars.forEach(pillar => {
             const rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
             rect.setAttribute('x', metersToPixels(pillar.x - pillar.width / 2));
-            rect.setAttribute('y', metersToPixels(pillar.y - pillar.height / 2));
+            rect.setAttribute('y', metersToPixels(HALL_HEIGHT - pillar.y - pillar.height / 2));
             rect.setAttribute('width', metersToPixels(pillar.width));
             rect.setAttribute('height', metersToPixels(pillar.height));
             rect.setAttribute('rx', metersToPixels(0.05));
@@ -153,15 +171,15 @@
             group.classList.add('reference');
             const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
             line.setAttribute('x1', metersToPixels(ref.from.x));
-            line.setAttribute('y1', metersToPixels(ref.from.y));
+            line.setAttribute('y1', toScreenY(ref.from.y));
             line.setAttribute('x2', metersToPixels(ref.to.x));
-            line.setAttribute('y2', metersToPixels(ref.to.y));
+            line.setAttribute('y2', toScreenY(ref.to.y));
             group.appendChild(line);
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
             const textX = (ref.from.x + ref.to.x) / 2;
             const textY = (ref.from.y + ref.to.y) / 2;
             text.setAttribute('x', metersToPixels(textX));
-            text.setAttribute('y', metersToPixels(textY) - 6);
+            text.setAttribute('y', toScreenY(textY) - 6);
             text.setAttribute('text-anchor', 'middle');
             text.textContent = ref.label;
             group.appendChild(text);
@@ -370,8 +388,8 @@
             const offsetY = TABLE_WIDTH / 2 + CHAIR_OFFSET;
             for (let i = 0; i < chairsPerSide; i++) {
                 const x = groupStart + 0.15 + i * step;
-                positionsTop.push({ x, y: centerY - offsetY });
-                positionsBottom.push({ x, y: centerY + offsetY });
+                positionsTop.push({ x, y: centerY + offsetY });
+                positionsBottom.push({ x, y: centerY - offsetY });
             }
             const allPositions = [...positionsTop.map((pos, idx) => ({ ...pos, side: 'top', order: idx })), ...positionsBottom.map((pos, idx) => ({ ...pos, side: 'bottom', order: idx }))];
 
@@ -434,8 +452,7 @@
             tableEl.className = 'table';
             tableEl.style.width = `${metersToPixels(TABLE_LENGTH)}px`;
             tableEl.style.height = `${metersToPixels(TABLE_WIDTH)}px`;
-            tableEl.style.left = `${metersToPixels(table.x - TABLE_LENGTH / 2)}px`;
-            tableEl.style.top = `${metersToPixels(table.y - TABLE_WIDTH / 2)}px`;
+            positionTableElement(tableEl, table);
             tableEl.dataset.tableId = table.id;
 
             const label = document.createElement('div');
@@ -474,8 +491,7 @@
                         chairEl.title = guest.name;
                     }
                 }
-                chairEl.style.left = `${metersToPixels(chair.x - CHAIR_SIZE / 2)}px`;
-                chairEl.style.top = `${metersToPixels(chair.y - CHAIR_SIZE / 2)}px`;
+                positionChairElement(chairEl, chair);
                 chairEl.dataset.tableId = table.id;
                 chairEl.dataset.chairId = chair.id;
                 chairEl.addEventListener('click', onChairClick);
@@ -490,10 +506,15 @@
 
     function renderSummary() {
         summaryTables.textContent = String(state.tables.length);
-        const assigned = state.guests.filter(guest => guest.assignedTo).length;
-        const unassigned = state.guests.length - assigned;
-        summaryAssigned.textContent = String(assigned);
-        summaryUnassigned.textContent = String(unassigned);
+        const totalSeats = state.tables.reduce((sum, table) => sum + table.chairs.length, 0);
+        const occupiedSeats = state.tables.reduce((sum, table) => sum + table.chairs.filter(chair => chair.guestId).length, 0);
+        const freeSeats = Math.max(0, totalSeats - occupiedSeats);
+        summarySeatsTotal.textContent = String(totalSeats);
+        summarySeatsFree.textContent = String(freeSeats);
+        const assignedGuests = state.guests.filter(guest => guest.assignedTo).length;
+        const unassignedGuests = state.guests.length - assignedGuests;
+        summaryAssigned.textContent = String(assignedGuests);
+        summaryUnassigned.textContent = String(unassignedGuests);
         tableCountInput.value = state.settings.tableCount;
         tableCountValue.textContent = String(state.settings.tableCount);
         modeToggle.checked = state.settings.mode === 'more';
@@ -533,45 +554,89 @@
         if (!table) return;
         event.preventDefault();
         pushHistory();
+        const pointerId = event.pointerId;
         const startX = event.clientX;
         const startY = event.clientY;
         const initialX = table.x;
         const initialY = table.y;
+        const originalChairPositions = new Map();
+        const chairOffsets = new Map();
+        table.chairs.forEach(chair => {
+            originalChairPositions.set(chair.id, { x: chair.x, y: chair.y });
+            chairOffsets.set(chair.id, {
+                offsetX: chair.x - table.x,
+                offsetY: chair.y - table.y,
+                element: entitiesLayer.querySelector(`.chair[data-chair-id="${chair.id}"]`)
+            });
+        });
         const tableElement = event.currentTarget;
         tableElement.classList.add('dragging');
+        if (tableElement.setPointerCapture) {
+            try {
+                tableElement.setPointerCapture(pointerId);
+            } catch (error) {
+                // ignore pointer capture errors
+            }
+        }
+
+        const applyChairOffsets = () => {
+            chairOffsets.forEach((info, chairId) => {
+                const chair = table.chairs.find(c => c.id === chairId);
+                if (!chair) return;
+                chair.x = table.x + info.offsetX;
+                chair.y = table.y + info.offsetY;
+                if (info.element) {
+                    positionChairElement(info.element, chair);
+                }
+            });
+        };
 
         const onMove = moveEvent => {
             moveEvent.preventDefault();
             const deltaX = (moveEvent.clientX - startX) / SCALE;
             const deltaY = (moveEvent.clientY - startY) / SCALE;
             table.x = initialX + deltaX;
-            table.y = initialY + deltaY;
-            tableElement.style.left = `${metersToPixels(table.x - TABLE_LENGTH / 2)}px`;
-            tableElement.style.top = `${metersToPixels(table.y - TABLE_WIDTH / 2)}px`;
+            table.y = initialY - deltaY;
+            positionTableElement(tableElement, table);
+            applyChairOffsets();
         };
 
         const onUp = upEvent => {
             upEvent.preventDefault();
             document.removeEventListener('pointermove', onMove);
             document.removeEventListener('pointerup', onUp);
+            if (tableElement.releasePointerCapture) {
+                try {
+                    tableElement.releasePointerCapture(pointerId);
+                } catch (error) {
+                    // ignore release errors
+                }
+            }
             tableElement.classList.remove('dragging');
-            const snappedX = snap(table.x);
-            const snappedY = snap(table.y);
-            const previousX = table.x;
-            const previousY = table.y;
-            table.x = snappedX;
-            table.y = snappedY;
+
+            table.x = snap(table.x);
+            table.y = snap(table.y);
+            applyChairOffsets();
+
+            const connection = findConnection(table);
+            if (connection) {
+                table.x = connection.x;
+                table.y = connection.y;
+                applyChairOffsets();
+            }
 
             if (!isPositionWithinHall(table.x, table.y) || collidesWithColumns(table.x, table.y, table.id) || collidesWithTables(table.x, table.y, table.id)) {
                 table.x = initialX;
                 table.y = initialY;
-            } else {
-                const connection = findConnection(table);
-                if (connection) {
-                    table.x = connection.x;
-                    table.y = connection.y;
-                }
+                table.chairs.forEach(chair => {
+                    const original = originalChairPositions.get(chair.id);
+                    if (original) {
+                        chair.x = original.x;
+                        chair.y = original.y;
+                    }
+                });
             }
+
             recomputeGroups(state);
             recomputeChairs(state);
             applyRemovedGuestFallback();
@@ -891,6 +956,7 @@
     }
 
     function persistLocal() {
+        state.version = 2;
         localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(state));
     }
 
@@ -935,23 +1001,26 @@
 
     function hydrateState(data) {
         state = createEmptyState();
+        const sourceVersion = data.version || 1;
+        const needsFlip = sourceVersion < 2;
         state.settings = data.settings || state.settings;
         state.tables = (data.tables || []).map((table, index) => ({
             id: table.id || `t${index + 1}`,
             number: table.number || index + 1,
             x: table.x,
-            y: table.y,
+            y: needsFlip && typeof table.y === 'number' ? HALL_HEIGHT - table.y : table.y,
             rotation: table.rotation || 0,
             description: table.description || '',
             chairs: Array.isArray(table.chairs) ? table.chairs.map((chair, chairIndex) => ({
                 id: chair.id || `${table.id}_c${chairIndex + 1}`,
                 x: chair.x,
-                y: chair.y,
+                y: needsFlip && typeof chair.y === 'number' ? HALL_HEIGHT - chair.y : chair.y,
                 side: chair.side || 'top',
                 guestId: chair.guest || chair.guestId || null
             })) : [],
             groupId: table.groupId || table.id
         }));
+        state.version = 2;
         state.guests = Array.isArray(data.guests) ? data.guests.map(guest => ({
             id: guest.id || `g${guest.name}`,
             name: guest.name,
