@@ -75,8 +75,8 @@ export class Room {
             line.setAttribute('y2', this.toScreenY(ref.to.y));
             group.appendChild(line);
             const text = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-            const textX = (ref.from.x + ref.to.x) / 2;
-            const textY = (ref.from.y + ref.to.y) / 2;
+            const textX = ref.labelPosition ? ref.labelPosition.x : (ref.from.x + ref.to.x) / 2;
+            const textY = ref.labelPosition ? ref.labelPosition.y : (ref.from.y + ref.to.y) / 2;
             text.setAttribute('x', this.metersToPixels(textX));
             text.setAttribute('y', this.toScreenY(textY) - 6);
             text.setAttribute('text-anchor', 'middle');

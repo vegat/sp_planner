@@ -195,24 +195,36 @@ export class PlannerState {
         });
     }
 
-    collidesWithTables(x, y, movingTableId, rotation = 0, ignoredIds = new Set()) {
+    collidesWithTables(x, y, movingTableId, rotation = 0, ignoredIds = new Set(), candidateTable = null) {
         const rect = tableRectAt(x, y, rotation);
         const ignored = new Set([movingTableId, ...ignoredIds]);
         return this.tables.some(table => {
             if (ignored.has(table.id)) return false;
             const otherRect = tableRectAt(table.x, table.y, table.rotation || 0);
-            return rectanglesIntersect(rect, otherRect);
+            if (!rectanglesIntersect(rect, otherRect)) {
+                return false;
+            }
+            if (candidateTable && Table.connectionBetween(candidateTable, table)) {
+                return false;
+            }
+            return true;
         });
     }
 
-    chairCollidesWithTables(sourceTableId, chairRect, ignoredIds = new Set()) {
+    chairCollidesWithTables(sourceTableId, chairRect, ignoredIds = new Set(), candidateTable = null) {
         const ignored = new Set([sourceTableId, ...ignoredIds]);
         return this.tables.some(table => {
             if (ignored.has(table.id)) {
                 return false;
             }
             const rect = tableRectAt(table.x, table.y, table.rotation || 0);
-            return rectanglesIntersect(chairRect, rect);
+            if (!rectanglesIntersect(chairRect, rect)) {
+                return false;
+            }
+            if (candidateTable && Table.connectionBetween(candidateTable, table)) {
+                return false;
+            }
+            return true;
         });
     }
 
@@ -223,13 +235,16 @@ export class PlannerState {
                 continue;
             }
             const rotation = table.rotation || 0;
+            const simulated = table.clone();
+            simulated.x = candidate.x;
+            simulated.y = candidate.y;
             if (!this.room.isPositionWithinHall(candidate.x, candidate.y, rotation)) {
                 return { valid: false, reason: 'hall-bounds' };
             }
             if (this.room.collidesWithColumns(candidate.x, candidate.y, rotation)) {
                 return { valid: false, reason: 'pillar-hit' };
             }
-            if (this.collidesWithTables(candidate.x, candidate.y, table.id, rotation, movingIds)) {
+            if (this.collidesWithTables(candidate.x, candidate.y, table.id, rotation, movingIds, simulated)) {
                 return { valid: false, reason: 'table-collision' };
             }
             const deltaX = candidate.x - table.x;
@@ -247,7 +262,7 @@ export class PlannerState {
                     return { valid: false, reason: 'chair-pillar' };
                 }
                 const chairRect = chairRectAt(newX, newY);
-                if (this.chairCollidesWithTables(table.id, chairRect, movingIds)) {
+                if (this.chairCollidesWithTables(table.id, chairRect, movingIds, simulated)) {
                     return { valid: false, reason: 'chair-table' };
                 }
             }

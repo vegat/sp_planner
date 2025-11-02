@@ -34,10 +34,28 @@ export const pillars = [5, 10, 15, 20].map(x => ({
 }));
 
 export const references = [
-    { from: { x: 0, y: 5.3 }, to: { x: 0, y: 11 }, label: 'Wejście na zaplecze' },
-    { from: { x: 8, y: 11 }, to: { x: 14, y: 11 }, label: 'Brama na łąkę' },
-    { from: { x: 16, y: 11 }, to: { x: 22, y: 11 }, label: 'Przeszklona brama' },
-    { from: { x: 11.5, y: 0 }, to: { x: 13.5, y: 0 }, label: 'Wejście' }
+    {
+        from: { x: 0, y: 5.3 },
+        to: { x: 0, y: 11 },
+        label: 'Wejście na zaplecze',
+        labelPosition: { x: 1.4, y: 8.15 }
+    },
+    {
+        from: { x: 8, y: 11 },
+        to: { x: 14, y: 11 },
+        label: 'Brama na łąkę',
+        labelPosition: { x: 7.5, y: 10.6 }
+    },
+    {
+        from: { x: 16, y: 11 },
+        to: { x: 22, y: 11 },
+        label: 'Przeszklona brama'
+    },
+    {
+        from: { x: 16.5, y: 1 },
+        to: { x: 17.5, y: 1 },
+        label: 'Wejście'
+    }
 ];
 
 export const defaultLayoutBlueprint = [
