@@ -52,8 +52,8 @@ export const references = [
         label: 'Przeszklona brama'
     },
     {
-        from: { x: 11.5, y: 0 },
-        to: { x: 13.5, y: 0 },
+        from: { x: 16.5, y: 1 },
+        to: { x: 17.5, y: 1 },
         label: 'Wejście'
     }
 ];
