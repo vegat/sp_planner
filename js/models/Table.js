@@ -14,7 +14,8 @@ export class Table {
         isHead = false,
         headSeatCount = HEAD_SEATS_MAX,
         chairs = [],
-        groupId = null
+        groupId = null,
+        shortSideOption = 'none'
     }) {
         this.id = id;
         this.number = number;
@@ -25,6 +26,7 @@ export class Table {
         this.isHead = isHead;
         this.headSeatCount = Table.clampHeadSeatCount(headSeatCount);
         this.groupId = groupId || id;
+        this.shortSideOption = Table.normalizeShortSideOption(shortSideOption);
         this.chairs = chairs.map(chair => chair instanceof Chair ? chair : Chair.fromJSON(id, chair));
     }
 
@@ -39,7 +41,8 @@ export class Table {
             isHead: this.isHead,
             headSeatCount: this.headSeatCount,
             chairs: this.chairs.map(chair => chair.clone()),
-            groupId: this.groupId
+            groupId: this.groupId,
+            shortSideOption: this.shortSideOption
         });
     }
 
@@ -61,11 +64,21 @@ export class Table {
         this.isHead = Boolean(isHead);
         if (!this.isHead) {
             this.headSeatCount = Table.clampHeadSeatCount(HEAD_SEATS_MAX);
+        } else {
+            this.shortSideOption = 'none';
         }
     }
 
     setHeadSeatCount(count) {
         this.headSeatCount = Table.clampHeadSeatCount(count);
+    }
+
+    setShortSideOption(option) {
+        this.shortSideOption = this.isHead ? 'none' : Table.normalizeShortSideOption(option);
+    }
+
+    shortSideDesiredSeats() {
+        return Table.shortSideSeatCountForOption(this.shortSideOption);
     }
 
     get label() {
@@ -134,13 +147,30 @@ export class Table {
             isHead: this.isHead,
             headSeatCount: this.headSeatCount,
             chairs: this.chairs.map(chair => chair.toJSON()),
-            groupId: this.groupId
+            groupId: this.groupId,
+            shortSideOption: this.shortSideOption
         };
     }
 
     static clampHeadSeatCount(value) {
         const numeric = Number.isFinite(value) ? value : HEAD_SEATS_MAX;
         return clamp(Math.round(numeric), HEAD_SEATS_MIN, HEAD_SEATS_MAX);
+    }
+
+    static normalizeShortSideOption(value) {
+        switch (value) {
+            case 'single':
+            case 'both':
+                return value;
+            default:
+                return 'none';
+        }
+    }
+
+    static shortSideSeatCountForOption(option) {
+        if (option === 'both') return 2;
+        if (option === 'single') return 1;
+        return 0;
     }
 
     static orientationFor(table) {

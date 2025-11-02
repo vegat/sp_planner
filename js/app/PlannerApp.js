@@ -17,6 +17,7 @@ export class PlannerApp {
         this.selectionState = null;
         this.draggingGuestId = null;
         this.dragContext = null;
+        this.pendingShortSideOption = 'none';
         this.renderer = new PlannerRenderer({
             room: this.room,
             state: this.state,
@@ -32,7 +33,8 @@ export class PlannerApp {
             onChairDragOver: event => this.onChairDragOver(event),
             onChairDrop: (event, table, chair) => this.onChairDrop(event, table, chair),
             onGuestDragStart: (event, guest) => this.onGuestDragStart(event, guest),
-            onGuestDragEnd: () => this.onGuestDragEnd()
+            onGuestDragEnd: () => this.onGuestDragEnd(),
+            onGuestRemove: guest => this.removeGuest(guest.id)
         });
     }
 
@@ -71,7 +73,9 @@ export class PlannerApp {
             chairModalClose,
             tableModalClose,
             tableModalCancel,
-            clearChairBtn
+            clearChairBtn,
+            tableShortSidesSelect,
+            tableHeadCheckbox
         } = this.elements;
 
         window.addEventListener('resize', () => {
@@ -123,7 +127,12 @@ export class PlannerApp {
 
         tableModalClose.addEventListener('click', () => this.hideTableModal());
         tableModalCancel.addEventListener('click', () => this.hideTableModal());
-        this.elements.tableHeadCheckbox.addEventListener('change', () => this.updateHeadSeatField(this.elements.tableHeadCheckbox.checked));
+        tableHeadCheckbox.addEventListener('change', () => this.updateHeadSeatField(tableHeadCheckbox.checked));
+        tableShortSidesSelect.addEventListener('change', () => {
+            if (!tableHeadCheckbox.checked) {
+                this.pendingShortSideOption = tableShortSidesSelect.value;
+            }
+        });
         this.elements.tableForm.addEventListener('submit', event => this.onTableFormSubmit(event));
     }
 
@@ -469,8 +478,10 @@ export class PlannerApp {
         this.elements.tableDescriptionInput.value = table.description;
         this.elements.tableRotationSelect.value = String(table.rotation);
         this.elements.tableHeadCheckbox.checked = table.isHead;
-        this.updateHeadSeatField(table.isHead);
         this.elements.tableHeadSeatsSelect.value = String(table.headSeatCount);
+        this.pendingShortSideOption = table.shortSideOption || 'none';
+        this.elements.tableShortSidesSelect.value = table.shortSideOption || 'none';
+        this.updateHeadSeatField(table.isHead);
         this.elements.tableModal.classList.remove('hidden');
     }
 
@@ -482,8 +493,14 @@ export class PlannerApp {
     updateHeadSeatField(show) {
         if (show) {
             this.elements.tableHeadSeatsField.classList.remove('hidden');
+            this.pendingShortSideOption = this.elements.tableShortSidesSelect.value || this.pendingShortSideOption;
+            this.elements.tableShortSidesSelect.value = 'none';
+            this.elements.tableShortSidesSelect.disabled = true;
         } else {
             this.elements.tableHeadSeatsField.classList.add('hidden');
+            this.elements.tableShortSidesSelect.disabled = false;
+            const restore = this.pendingShortSideOption || 'none';
+            this.elements.tableShortSidesSelect.value = restore;
         }
     }
 
@@ -501,10 +518,25 @@ export class PlannerApp {
         table.setHead(isHead);
         if (isHead) {
             table.setHeadSeatCount(Number(this.elements.tableHeadSeatsSelect.value));
+            table.setShortSideOption('none');
+        }
+        if (!isHead) {
+            table.setShortSideOption(this.elements.tableShortSidesSelect.value);
+            this.pendingShortSideOption = this.elements.tableShortSidesSelect.value;
         }
         this.state.recomputeGroups();
         this.state.recomputeChairs();
         this.hideTableModal();
+        this.persistLocal();
+        this.render();
+    }
+
+    removeGuest(guestId) {
+        if (!guestId) {
+            return;
+        }
+        this.pushHistory();
+        this.state.removeGuest(guestId);
         this.persistLocal();
         this.render();
     }

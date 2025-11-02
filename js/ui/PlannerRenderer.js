@@ -16,7 +16,8 @@ export class PlannerRenderer {
             onChairDragOver: () => {},
             onChairDrop: () => {},
             onGuestDragStart: () => {},
-            onGuestDragEnd: () => {}
+            onGuestDragEnd: () => {},
+            onGuestRemove: () => {}
         };
     }
 
@@ -152,7 +153,24 @@ export class PlannerRenderer {
             li.className = guest.assignedTo ? 'guest assigned' : 'guest';
             li.dataset.guestId = guest.id;
             li.draggable = true;
-            li.textContent = guest.name;
+            const nameSpan = document.createElement('span');
+            nameSpan.className = 'guest-name';
+            nameSpan.textContent = guest.name;
+            li.appendChild(nameSpan);
+
+            const actions = document.createElement('div');
+            actions.className = 'guest-actions';
+            const removeBtn = document.createElement('button');
+            removeBtn.type = 'button';
+            removeBtn.className = 'guest-remove';
+            removeBtn.textContent = 'Usuń';
+            removeBtn.addEventListener('pointerdown', event => event.stopPropagation());
+            removeBtn.addEventListener('click', event => {
+                event.stopPropagation();
+                this.handlers.onGuestRemove(guest);
+            });
+            actions.appendChild(removeBtn);
+            li.appendChild(actions);
             li.addEventListener('dragstart', event => this.handlers.onGuestDragStart(event, guest));
             li.addEventListener('dragend', event => this.handlers.onGuestDragEnd(event, guest));
             guestList.appendChild(li);

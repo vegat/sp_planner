@@ -3,7 +3,7 @@ import { Table } from '../models/Table.js';
 import { Guest } from '../models/Guest.js';
 import { clamp, normalizeRotation } from '../utils/math.js';
 import { chairRectAt, rectanglesIntersect, tableHalfDimensionsForRotation, tableRectAt } from '../utils/geometry.js';
-import { CHAIR_EDGE_CLEARANCE, CHAIR_OFFSET } from '../core/constants.js';
+import { CHAIR_EDGE_CLEARANCE, CHAIR_OFFSET, CHAIR_SIZE } from '../core/constants.js';
 
 export class PlannerState {
     constructor(room) {
@@ -40,7 +40,8 @@ export class PlannerState {
             headSeatCount: this.clampHeadSeatCount(pos.headSeatCount ?? this.defaultHeadSeatCount(this.settings.mode), this.settings.mode),
             description: pos.description || '',
             chairs: [],
-            groupId: `t${index + 1}`
+            groupId: `t${index + 1}`,
+            shortSideOption: pos.shortSideOption || 'none'
         }));
         this.recomputeGroups();
         this.recomputeChairs();
@@ -58,7 +59,8 @@ export class PlannerState {
                 y: entry.y,
                 rotation: normalizeRotation(entry.rotation || 0),
                 isHead: Boolean(entry.isHead),
-                headSeatCount: this.clampHeadSeatCount(entry.headSeatCount ?? this.defaultHeadSeatCount('less'), 'less')
+                headSeatCount: this.clampHeadSeatCount(entry.headSeatCount ?? this.defaultHeadSeatCount('less'), 'less'),
+                shortSideOption: entry.shortSideOption || 'none'
             };
             if (this.room.isPositionWithinHall(candidate.x, candidate.y, candidate.rotation) &&
                 !this.room.collidesWithColumns(candidate.x, candidate.y, candidate.rotation) &&
@@ -102,7 +104,8 @@ export class PlannerState {
                         y,
                         rotation,
                         isHead: false,
-                        headSeatCount: this.clampHeadSeatCount(this.defaultHeadSeatCount(mode), mode)
+                        headSeatCount: this.clampHeadSeatCount(this.defaultHeadSeatCount(mode), mode),
+                        shortSideOption: 'none'
                     };
                 }
             }
@@ -112,7 +115,8 @@ export class PlannerState {
             y: 2,
             rotation,
             isHead: false,
-            headSeatCount: this.clampHeadSeatCount(this.defaultHeadSeatCount(mode), mode)
+            headSeatCount: this.clampHeadSeatCount(this.defaultHeadSeatCount(mode), mode),
+            shortSideOption: 'none'
         };
     }
 
@@ -157,7 +161,8 @@ export class PlannerState {
                 headSeatCount: normalizedSeatCount,
                 description: table.description || '',
                 chairs: [],
-                groupId: table.groupId || table.id || `t${index + 1}`
+                groupId: table.groupId || table.id || `t${index + 1}`,
+                shortSideOption: table.shortSideOption || table.shortSideSeats || 'none'
             });
             previousAssignments.set(newTable.id, (table.chairs || []).map(chair => ({
                 id: chair.id,
@@ -332,6 +337,7 @@ export class PlannerState {
             if (!tablesInGroup.length) {
                 return;
             }
+            const connectionSides = this.computeShortSideConnections(tablesInGroup);
             const normalTables = tablesInGroup.filter(table => !table.isHead);
             if (normalTables.length) {
                 const orientation = Table.orientationFor(normalTables[0]);
@@ -388,21 +394,24 @@ export class PlannerState {
                         return a.order - b.order;
                     });
                     const prev = previousAssignments.get(table.id) || [];
-                    const newChairs = relevant.map((pos, index) => ({
-                        id: `${table.id}_c${index + 1}`,
+                    const seatPositions = relevant.map(pos => ({
                         x: pos.x,
                         y: pos.y,
-                        side: pos.side,
-                        guestId: prev[index] ? prev[index].guestId : null
+                        side: pos.side
                     }));
-                    if (prev.length > newChairs.length) {
-                        prev.slice(newChairs.length).forEach(item => {
+                    const shortSeats = this.computeShortSideChairPositions(
+                        table,
+                        connectionSides.get(table.id) || new Set()
+                    );
+                    seatPositions.push(...shortSeats);
+                    if (prev.length > seatPositions.length) {
+                        prev.slice(seatPositions.length).forEach(item => {
                             if (item.guestId) {
                                 removedGuests.add(item.guestId);
                             }
                         });
                     }
-                    table.assignChairsFromPositions(newChairs, prev);
+                    table.assignChairsFromPositions(seatPositions, prev);
                 });
             }
 
@@ -413,6 +422,131 @@ export class PlannerState {
         });
 
         this.applyRemovedGuestFallback(removedGuests);
+    }
+
+    computeShortSideConnections(tables = []) {
+        const map = new Map();
+        tables.forEach(table => {
+            map.set(table.id, new Set());
+        });
+        for (let i = 0; i < tables.length; i++) {
+            for (let j = i + 1; j < tables.length; j++) {
+                const a = tables[i];
+                const b = tables[j];
+                const connection = Table.connectionBetween(a, b);
+                if (!connection) {
+                    continue;
+                }
+                const orientation = Table.orientationFor(a);
+                if (orientation === 'horizontal') {
+                    if (b.x >= a.x) {
+                        const setA = map.get(a.id);
+                        const setB = map.get(b.id);
+                        if (setA) setA.add('right');
+                        if (setB) setB.add('left');
+                    } else {
+                        const setA = map.get(a.id);
+                        const setB = map.get(b.id);
+                        if (setA) setA.add('left');
+                        if (setB) setB.add('right');
+                    }
+                } else {
+                    if (b.y >= a.y) {
+                        const setA = map.get(a.id);
+                        const setB = map.get(b.id);
+                        if (setA) setA.add('top');
+                        if (setB) setB.add('bottom');
+                    } else {
+                        const setA = map.get(a.id);
+                        const setB = map.get(b.id);
+                        if (setA) setA.add('bottom');
+                        if (setB) setB.add('top');
+                    }
+                }
+            }
+        }
+        return map;
+    }
+
+    computeShortSideChairPositions(table, connectedSides = new Set()) {
+        if (!table || table.isHead) {
+            return [];
+        }
+        const desired = typeof table.shortSideDesiredSeats === 'function'
+            ? table.shortSideDesiredSeats()
+            : Table.shortSideSeatCountForOption(table.shortSideOption || 'none');
+        if (desired <= 0) {
+            return [];
+        }
+        const orientation = Table.orientationFor(table);
+        const rect = Table.tableRectFor(table);
+        const { halfX, halfY } = tableHalfDimensionsForRotation(table.rotation || 0);
+        const minClearance = CHAIR_OFFSET + CHAIR_SIZE / 2;
+        const available = [];
+
+        if (orientation === 'horizontal') {
+            const leftClearance = rect.left;
+            if (!connectedSides.has('left')) {
+                const x = table.x - halfX - CHAIR_OFFSET;
+                const y = table.y;
+                if (leftClearance >= minClearance &&
+                    this.room.isChairWithinHall(x, y) &&
+                    !this.room.chairCollidesWithColumns(x, y) &&
+                    !this.chairCollidesWithTables(table.id, chairRectAt(x, y))) {
+                    available.push({ key: 'left', clearance: leftClearance, x, y, order: 0 });
+                }
+            }
+            const rightClearance = this.room.width - rect.right;
+            if (!connectedSides.has('right')) {
+                const x = table.x + halfX + CHAIR_OFFSET;
+                const y = table.y;
+                if (rightClearance >= minClearance &&
+                    this.room.isChairWithinHall(x, y) &&
+                    !this.room.chairCollidesWithColumns(x, y) &&
+                    !this.chairCollidesWithTables(table.id, chairRectAt(x, y))) {
+                    available.push({ key: 'right', clearance: rightClearance, x, y, order: 1 });
+                }
+            }
+        } else {
+            const bottomClearance = rect.top;
+            if (!connectedSides.has('bottom')) {
+                const x = table.x;
+                const y = table.y - halfY - CHAIR_OFFSET;
+                if (bottomClearance >= minClearance &&
+                    this.room.isChairWithinHall(x, y) &&
+                    !this.room.chairCollidesWithColumns(x, y) &&
+                    !this.chairCollidesWithTables(table.id, chairRectAt(x, y))) {
+                    available.push({ key: 'bottom', clearance: bottomClearance, x, y, order: 0 });
+                }
+            }
+            const topClearance = this.room.height - rect.bottom;
+            if (!connectedSides.has('top')) {
+                const x = table.x;
+                const y = table.y + halfY + CHAIR_OFFSET;
+                if (topClearance >= minClearance &&
+                    this.room.isChairWithinHall(x, y) &&
+                    !this.room.chairCollidesWithColumns(x, y) &&
+                    !this.chairCollidesWithTables(table.id, chairRectAt(x, y))) {
+                    available.push({ key: 'top', clearance: topClearance, x, y, order: 1 });
+                }
+            }
+        }
+
+        if (!available.length) {
+            return [];
+        }
+
+        let selected;
+        if (desired >= available.length) {
+            selected = available;
+        } else if (desired === 1) {
+            selected = [available.reduce((best, current) => current.clearance > best.clearance ? current : best, available[0])];
+        } else {
+            selected = available.slice(0, desired);
+        }
+
+        selected.sort((a, b) => a.order - b.order);
+        return selected.map(item => ({ x: item.x, y: item.y, side: item.key }));
     }
 
     updateHeadTableChairs(table, previousAssignments, removedGuests, mode) {
@@ -600,7 +734,8 @@ export class PlannerState {
             headSeatCount: this.clampHeadSeatCount(position.headSeatCount ?? this.defaultHeadSeatCount(this.settings.mode), this.settings.mode),
             description: '',
             chairs: [],
-            groupId: newId
+            groupId: newId,
+            shortSideOption: position.shortSideOption || 'none'
         });
         this.tables.push(table);
         this.settings.tableCount = this.tables.length;
@@ -655,7 +790,7 @@ export class PlannerState {
     }
 
     setTableCount(count) {
-        const desired = clamp(Math.round(count), 4, 16);
+        const desired = clamp(Math.round(count), 4, 18);
         if (desired === this.tables.length) {
             return true;
         }

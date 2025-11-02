@@ -18,7 +18,7 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
         <header class="toolbar">
             <div class="control-group">
                 <label for="tableCount">Liczba stołów: <span id="tableCountValue"></span></label>
-                <input type="range" id="tableCount" min="4" max="16" step="1">
+                <input type="range" id="tableCount" min="4" max="18" step="1">
             </div>
             <div class="control-group">
                 <label class="toggle">
@@ -101,6 +101,12 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
                         <option value="4">4 miejsca</option>
                     </select>
                 </div>
+                <label for="tableShortSides">Krzesła na krótszych bokach</label>
+                <select id="tableShortSides">
+                    <option value="none">Brak</option>
+                    <option value="single">Krzesło na jednym boku</option>
+                    <option value="both">Krzesła na obu bokach</option>
+                </select>
                 <div class="modal-actions">
                     <button type="submit">Zapisz</button>
                     <button type="button" id="tableModalCancel">Anuluj</button>

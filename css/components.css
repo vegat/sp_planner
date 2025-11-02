@@ -46,6 +46,14 @@
     user-select: none;
 }
 
+.guest-list li .guest-name {
+    flex: 1;
+    margin-right: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .guest-list li.assigned {
     background: #d1fae5;
 }
@@ -53,6 +61,25 @@
 .guest-list li.dragging {
     opacity: 0.6;
     cursor: grabbing;
+}
+
+.guest-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.guest-remove {
+    border: none;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.guest-remove:hover {
+    background: #fecaca;
 }
 
 .guest-list li span.status {

@@ -46,6 +46,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tableHeadCheckbox: qs('#tableHead'),
         tableHeadSeatsField: qs('#tableHeadSeatsField'),
         tableHeadSeatsSelect: qs('#tableHeadSeats'),
+        tableShortSidesSelect: qs('#tableShortSides'),
         tableModalClose: qs('#tableModalClose'),
         tableModalCancel: qs('#tableModalCancel'),
         selectionBox
