@@ -1,0 +1,118 @@
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(15, 23, 42, 0.35);
+    z-index: 1000;
+}
+
+.modal.hidden {
+    display: none;
+}
+
+.modal-content {
+    background: #ffffff;
+    padding: 1.5rem;
+    border-radius: 10px;
+    box-shadow: 0 12px 24px rgba(15, 23, 42, 0.2);
+    position: relative;
+    width: min(90vw, 360px);
+}
+
+.modal-close {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    border: none;
+    background: transparent;
+    font-size: 1.5rem;
+    cursor: pointer;
+}
+
+.modal form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.modal form label {
+    font-size: 0.85rem;
+    color: #1f2933;
+}
+
+.modal form input[type="text"],
+.modal form textarea,
+.modal form select {
+    width: 100%;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #cbd2d9;
+    font: inherit;
+    color: #1f2933;
+}
+
+.modal form textarea {
+    resize: vertical;
+    min-height: 3.5rem;
+}
+
+.modal .checkbox-field {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: #1f2933;
+}
+
+.modal .checkbox-field input {
+    width: auto;
+}
+
+.modal .conditional-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.modal .conditional-field.hidden {
+    display: none;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 1rem;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+}
+
+.modal-actions button[type="submit"] {
+    background: #2563eb;
+    color: #fff;
+}
+
+.modal-actions .danger {
+    background: #dc2626;
+    color: #fff;
+}
+
+#tableModalCancel {
+    background: #f1f5f9;
+    color: #1f2933;
+}
+
+#clearChair {
+    background: #f1f5f9;
+    color: #1f2933;
+}
