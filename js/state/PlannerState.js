@@ -2,7 +2,7 @@ import { DEFAULT_TABLE_COUNT, HEAD_SEATS_MAX, HEAD_SEATS_MIN, STATE_VERSION, def
 import { Table } from '../models/Table.js';
 import { Guest } from '../models/Guest.js';
 import { clamp, normalizeRotation } from '../utils/math.js';
-import { rectanglesIntersect, tableHalfDimensionsForRotation, tableRectAt } from '../utils/geometry.js';
+import { chairRectAt, rectanglesIntersect, tableHalfDimensionsForRotation, tableRectAt } from '../utils/geometry.js';
 import { CHAIR_EDGE_CLEARANCE, CHAIR_OFFSET } from '../core/constants.js';
 
 export class PlannerState {
@@ -203,6 +203,56 @@ export class PlannerState {
             const otherRect = tableRectAt(table.x, table.y, table.rotation || 0);
             return rectanglesIntersect(rect, otherRect);
         });
+    }
+
+    chairCollidesWithTables(sourceTableId, chairRect, ignoredIds = new Set()) {
+        const ignored = new Set([sourceTableId, ...ignoredIds]);
+        return this.tables.some(table => {
+            if (ignored.has(table.id)) {
+                return false;
+            }
+            const rect = tableRectAt(table.x, table.y, table.rotation || 0);
+            return rectanglesIntersect(chairRect, rect);
+        });
+    }
+
+    validateCandidateTables(candidates, movingIds = new Set()) {
+        for (const candidate of candidates) {
+            const table = this.tables.find(tbl => tbl.id === candidate.id);
+            if (!table) {
+                continue;
+            }
+            const rotation = table.rotation || 0;
+            if (!this.room.isPositionWithinHall(candidate.x, candidate.y, rotation)) {
+                return { valid: false, reason: 'hall-bounds' };
+            }
+            if (this.room.collidesWithColumns(candidate.x, candidate.y, rotation)) {
+                return { valid: false, reason: 'pillar-hit' };
+            }
+            if (this.collidesWithTables(candidate.x, candidate.y, table.id, rotation, movingIds)) {
+                return { valid: false, reason: 'table-collision' };
+            }
+            const deltaX = candidate.x - table.x;
+            const deltaY = candidate.y - table.y;
+            if (!table.chairs || !table.chairs.length) {
+                continue;
+            }
+            for (const chair of table.chairs) {
+                const newX = chair.x + deltaX;
+                const newY = chair.y + deltaY;
+                if (!this.room.isChairWithinHall(newX, newY)) {
+                    return { valid: false, reason: 'chair-bounds' };
+                }
+                if (this.room.chairCollidesWithColumns(newX, newY)) {
+                    return { valid: false, reason: 'chair-pillar' };
+                }
+                const chairRect = chairRectAt(newX, newY);
+                if (this.chairCollidesWithTables(table.id, chairRect, movingIds)) {
+                    return { valid: false, reason: 'chair-table' };
+                }
+            }
+        }
+        return { valid: true };
     }
 
     recomputeGroups() {

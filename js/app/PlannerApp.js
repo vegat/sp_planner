@@ -312,21 +312,8 @@ export class PlannerApp {
             x: initial.x + snapDeltaX,
             y: initial.y + snapDeltaY
         }));
-        const isValid = candidates.every(candidate => {
-            const table = this.dragContext.tables.find(tbl => tbl.id === candidate.id);
-            if (!table) return false;
-            const rotation = table.rotation || 0;
-            if (!this.room.isPositionWithinHall(candidate.x, candidate.y, rotation)) {
-                return false;
-            }
-            if (this.room.collidesWithColumns(candidate.x, candidate.y, rotation)) {
-                return false;
-            }
-            return !this.state.collidesWithTables(candidate.x, candidate.y, table.id, rotation, movingIds);
-        });
-        if (!isValid) {
-            return;
-        }
+        const validation = this.state.validateCandidateTables(candidates, movingIds);
+        this.dragContext.invalid = !validation.valid;
         this.dragContext.tables.forEach((table, index) => {
             const candidate = candidates[index];
             const deltaX = candidate.x - table.x;
@@ -339,13 +326,34 @@ export class PlannerApp {
     }
 
     finalizeTableDrag() {
-        if (this.dragContext?.snapshot) {
+        if (!this.dragContext || this.dragContext.type !== 'tables') {
+            this.dragContext = null;
+            return;
+        }
+        const movingIds = new Set(this.dragContext.tables.map(table => table.id));
+        const finalCandidates = this.dragContext.tables.map(table => ({
+            id: table.id,
+            x: table.x,
+            y: table.y
+        }));
+        const validation = this.state.validateCandidateTables(finalCandidates, movingIds);
+        if (!validation.valid) {
+            if (this.dragContext.snapshot) {
+                this.state.loadFromRaw(this.dragContext.snapshot);
+            }
+            this.render();
+            this.persistLocal();
+            this.dragContext = null;
+            return;
+        }
+        if (this.dragContext.snapshot) {
             this.pushHistory(this.dragContext.snapshot);
         }
         this.state.recomputeGroups();
         this.state.recomputeChairs();
         this.persistLocal();
         this.render();
+        this.dragContext = null;
     }
 
     updateSelectionBox() {

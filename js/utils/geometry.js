@@ -1,4 +1,4 @@
-import { TABLE_LENGTH, TABLE_WIDTH } from '../core/constants.js';
+import { CHAIR_SIZE, TABLE_LENGTH, TABLE_WIDTH } from '../core/constants.js';
 import { normalizeRotation } from './math.js';
 
 export function tableHalfDimensionsForRotation(rotation) {
@@ -22,6 +22,16 @@ export function tableRectAt(x, y, rotation) {
         right: x + halfX,
         top: y - halfY,
         bottom: y + halfY
+    };
+}
+
+export function chairRectAt(x, y) {
+    const half = CHAIR_SIZE / 2;
+    return {
+        left: x - half,
+        right: x + half,
+        top: y - half,
+        bottom: y + half
     };
 }
 

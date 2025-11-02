@@ -1,5 +1,5 @@
 import { HALL_HEIGHT, HALL_WIDTH, hallPolygon, pillars, references } from '../core/constants.js';
-import { pointInPolygon, tableRectAt } from '../utils/geometry.js';
+import { chairRectAt, pointInPolygon, tableRectAt } from '../utils/geometry.js';
 
 export class Room {
     constructor(svgElement, containerElement, plannerSection) {
@@ -99,6 +99,30 @@ export class Room {
 
     collidesWithColumns(x, y, rotation = 0) {
         const rect = tableRectAt(x, y, rotation);
+        return pillars.some(pillar => {
+            const pillarRect = {
+                left: pillar.x - pillar.width / 2,
+                right: pillar.x + pillar.width / 2,
+                top: pillar.y - pillar.height / 2,
+                bottom: pillar.y + pillar.height / 2
+            };
+            return !(rect.left >= pillarRect.right || rect.right <= pillarRect.left || rect.top >= pillarRect.bottom || rect.bottom <= pillarRect.top);
+        });
+    }
+
+    isChairWithinHall(x, y) {
+        const rect = chairRectAt(x, y);
+        const corners = [
+            { x: rect.left, y: rect.top },
+            { x: rect.right, y: rect.top },
+            { x: rect.right, y: rect.bottom },
+            { x: rect.left, y: rect.bottom }
+        ];
+        return corners.every(pt => pointInPolygon(pt, hallPolygon));
+    }
+
+    chairCollidesWithColumns(x, y) {
+        const rect = chairRectAt(x, y);
         return pillars.some(pillar => {
             const pillarRect = {
                 left: pillar.x - pillar.width / 2,
