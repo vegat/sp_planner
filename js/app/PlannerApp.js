@@ -73,6 +73,7 @@ export class PlannerApp {
             chairModalClose,
             tableModalClose,
             tableModalCancel,
+            tableDeleteBtn,
             clearChairBtn,
             tableShortSidesSelect,
             tableHeadCheckbox
@@ -134,6 +135,7 @@ export class PlannerApp {
             }
         });
         this.elements.tableForm.addEventListener('submit', event => this.onTableFormSubmit(event));
+        tableDeleteBtn.addEventListener('click', () => this.deleteCurrentTable());
     }
 
     render() {
@@ -198,14 +200,29 @@ export class PlannerApp {
     async sharePlan() {
         const snapshot = this.state.toJSON();
         snapshot.version = STATE_VERSION;
+        const shareResult = this.elements.shareResult;
+        shareResult.classList.remove('hidden');
+        shareResult.textContent = 'Trwa zapisywanie planu…';
         try {
             const response = await this.storage.saveRemote(snapshot);
-            if (response && response.link) {
-                this.elements.shareResult.textContent = `Link do planu: ${response.link}`;
-                this.elements.shareResult.classList.remove('hidden');
+            const link = response?.url || response?.link;
+            if (link) {
+                this.elements.plannerContainer.dataset.planId = response.id || '';
+                shareResult.innerHTML = '';
+                const label = document.createElement('span');
+                label.textContent = 'Link do planu: ';
+                const anchor = document.createElement('a');
+                anchor.href = link;
+                anchor.target = '_blank';
+                anchor.rel = 'noopener';
+                anchor.textContent = link;
+                shareResult.append(label, anchor);
+            } else {
+                shareResult.textContent = 'Plan zapisano, ale nie otrzymano linku.';
             }
         } catch (error) {
             console.error(error);
+            shareResult.textContent = error?.message || 'Nie udało się zapisać planu.';
         }
     }
 
@@ -482,6 +499,10 @@ export class PlannerApp {
         this.pendingShortSideOption = table.shortSideOption || 'none';
         this.elements.tableShortSidesSelect.value = table.shortSideOption || 'none';
         this.updateHeadSeatField(table.isHead);
+        if (this.elements.tableDeleteBtn) {
+            const minTables = Number(this.elements.tableCountInput?.min || 0);
+            this.elements.tableDeleteBtn.disabled = this.state.tables.length <= Math.max(1, minTables);
+        }
         this.elements.tableModal.classList.remove('hidden');
     }
 
@@ -539,5 +560,31 @@ export class PlannerApp {
         this.state.removeGuest(guestId);
         this.persistLocal();
         this.render();
+    }
+
+    deleteCurrentTable() {
+        if (!this.currentTableId) {
+            return;
+        }
+        const table = this.state.tables.find(item => item.id === this.currentTableId);
+        if (!table) {
+            return;
+        }
+        const minTables = Number(this.elements.tableCountInput?.min || 0);
+        if (this.state.tables.length <= Math.max(1, minTables)) {
+            alert('Nie można usunąć więcej stołów.');
+            return;
+        }
+        const confirmed = confirm('Czy na pewno chcesz usunąć stół?');
+        if (!confirmed) {
+            return;
+        }
+        this.pushHistory();
+        if (this.state.removeTableById(table.id)) {
+            this.selectedTables.delete(table.id);
+            this.hideTableModal();
+            this.persistLocal();
+            this.render();
+        }
     }
 }

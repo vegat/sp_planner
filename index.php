@@ -110,6 +110,7 @@ $planId = isset($_GET['id']) ? preg_replace('/[^a-zA-Z0-9_-]/', '', $_GET['id'])
                 <div class="modal-actions">
                     <button type="submit">Zapisz</button>
                     <button type="button" id="tableModalCancel">Anuluj</button>
+                    <button type="button" id="tableDeleteBtn" class="danger">🗑 Usuń stół</button>
                 </div>
             </form>
         </div>

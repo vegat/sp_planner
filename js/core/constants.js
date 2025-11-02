@@ -49,12 +49,20 @@ export const references = [
     {
         from: { x: 16, y: 11 },
         to: { x: 22, y: 11 },
-        label: 'Przeszklona brama'
+        label: 'Przeszklona brama',
+        labelPosition: { x: 19, y: 10.6 }
     },
     {
         from: { x: 11.5, y: 0 },
         to: { x: 13.5, y: 0 },
-        label: 'Wejście'
+        label: 'Wejście',
+        labelPosition: { x: 17.5, y: 0.6 }
+    },
+    {
+        from: { x: 5, y: 0 },
+        to: { x: 10, y: 0 },
+        label: 'Toalety',
+        labelPosition: { x: 7.5, y: 0.6 }
     }
 ];
 

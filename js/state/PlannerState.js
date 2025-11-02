@@ -744,6 +744,35 @@ export class PlannerState {
         return table;
     }
 
+    removeTableById(tableId) {
+        const index = this.tables.findIndex(table => table.id === tableId);
+        if (index === -1) {
+            return false;
+        }
+        const [removed] = this.tables.splice(index, 1);
+        const removedGuests = new Set();
+        if (removed) {
+            removed.chairs.forEach(chair => {
+                if (chair.guestId) {
+                    removedGuests.add(chair.guestId);
+                }
+            });
+        }
+        if (removedGuests.size) {
+            this.guests.forEach(guest => {
+                if (removedGuests.has(guest.id)) {
+                    guest.clearAssignment();
+                }
+            });
+        }
+        this.ensureTableNumbers();
+        this.settings.tableCount = this.tables.length;
+        this.ensureGuestsAlignment();
+        this.recomputeGroups();
+        this.recomputeChairs();
+        return true;
+    }
+
     removeTables(count) {
         const tablesWithGuests = this.tables.map(table => ({
             table,

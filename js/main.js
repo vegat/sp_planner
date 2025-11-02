@@ -49,6 +49,7 @@ document.addEventListener('DOMContentLoaded', () => {
         tableShortSidesSelect: qs('#tableShortSides'),
         tableModalClose: qs('#tableModalClose'),
         tableModalCancel: qs('#tableModalCancel'),
+        tableDeleteBtn: qs('#tableDeleteBtn'),
         selectionBox
     };
 

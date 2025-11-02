@@ -43,4 +43,9 @@ $host = $_SERVER['HTTP_HOST'] ?? 'localhost';
 $path = rtrim(dirname($_SERVER['SCRIPT_NAME']), '/\\');
 $url = $scheme . '://' . $host . $path . '/?id=' . $id;
 
-echo json_encode(['success' => true, 'id' => $id, 'url' => $url]);
+echo json_encode([
+    'success' => true,
+    'id' => $id,
+    'url' => $url,
+    'link' => $url
+]);

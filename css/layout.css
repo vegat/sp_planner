@@ -86,6 +86,17 @@
     word-break: break-all;
 }
 
+.share-result a {
+    color: #1d4ed8;
+    font-weight: 600;
+    text-decoration: underline;
+}
+
+.share-result a:hover,
+.share-result a:focus {
+    color: #1e40af;
+}
+
 .share-result.hidden {
     display: none;
 }

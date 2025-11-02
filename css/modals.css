@@ -102,6 +102,16 @@
     color: #fff;
 }
 
+.modal-actions .danger {
+    background: #dc2626;
+    color: #fff;
+}
+
+#tableModalCancel {
+    background: #f1f5f9;
+    color: #1f2933;
+}
+
 #clearChair {
     background: #f1f5f9;
     color: #1f2933;
