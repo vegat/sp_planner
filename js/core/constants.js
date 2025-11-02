@@ -1,6 +1,6 @@
 export const TABLE_LENGTH = 2.3;
 export const TABLE_WIDTH = 1.0;
-export const HALL_WIDTH = 25;
+export const HALL_WIDTH = 23.5;
 export const HALL_HEIGHT = 11;
 export const CHAIR_OFFSET = 0.4;
 export const CHAIR_EDGE_CLEARANCE = 0.35;
@@ -52,8 +52,8 @@ export const references = [
         label: 'Przeszklona brama'
     },
     {
-        from: { x: 16.5, y: 1 },
-        to: { x: 17.5, y: 1 },
+        from: { x: 11.5, y: 0 },
+        to: { x: 13.5, y: 0 },
         label: 'Wejście'
     }
 ];

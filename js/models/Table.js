@@ -162,16 +162,10 @@ export class Table {
             if (dy <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dx - TABLE_LENGTH) <= CONNECT_THRESHOLD) {
                 return { orientation: 'horizontal', type: 'length' };
             }
-            if (dx <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dy - TABLE_WIDTH) <= CONNECT_THRESHOLD) {
-                return { orientation: 'horizontal', type: 'width' };
-            }
             return null;
         }
         if (dx <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dy - TABLE_LENGTH) <= CONNECT_THRESHOLD) {
             return { orientation: 'vertical', type: 'length' };
-        }
-        if (dy <= CONNECT_ALIGNMENT_TOLERANCE && Math.abs(dx - TABLE_WIDTH) <= CONNECT_THRESHOLD) {
-            return { orientation: 'vertical', type: 'width' };
         }
         return null;
     }
@@ -184,47 +178,17 @@ export class Table {
         if (!connection) {
             return;
         }
-        const { orientation, type } = connection;
+        const { orientation } = connection;
         if (orientation === 'horizontal') {
-            if (type === 'length') {
-                const avgY = (a.y + b.y) / 2;
-                a.y = avgY;
-                b.y = avgY;
-                if (a.x < b.x) {
-                    a.x = b.x - TABLE_LENGTH;
-                } else {
-                    a.x = b.x + TABLE_LENGTH;
-                }
-            } else {
-                const avgX = (a.x + b.x) / 2;
-                a.x = avgX;
-                b.x = avgX;
-                if (a.y < b.y) {
-                    a.y = b.y - TABLE_WIDTH;
-                } else {
-                    a.y = b.y + TABLE_WIDTH;
-                }
-            }
+            const [anchor, target] = a.x <= b.x ? [a, b] : [b, a];
+            const direction = target.x >= anchor.x ? 1 : -1;
+            target.y = anchor.y;
+            target.x = anchor.x + direction * TABLE_LENGTH;
             return;
         }
-        if (type === 'length') {
-            const avgX = (a.x + b.x) / 2;
-            a.x = avgX;
-            b.x = avgX;
-            if (a.y < b.y) {
-                a.y = b.y - TABLE_LENGTH;
-            } else {
-                a.y = b.y + TABLE_LENGTH;
-            }
-        } else {
-            const avgY = (a.y + b.y) / 2;
-            a.y = avgY;
-            b.y = avgY;
-            if (a.x < b.x) {
-                a.x = b.x - TABLE_WIDTH;
-            } else {
-                a.x = b.x + TABLE_WIDTH;
-            }
-        }
+        const [anchor, target] = a.y <= b.y ? [a, b] : [b, a];
+        const direction = target.y >= anchor.y ? 1 : -1;
+        target.x = anchor.x;
+        target.y = anchor.y + direction * TABLE_LENGTH;
     }
 }
