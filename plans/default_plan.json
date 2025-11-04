@@ -1,0 +1,1102 @@
+{
+    "version": 4,
+    "tables": [
+        {
+            "id": "t14",
+            "number": 1,
+            "x": 21.25,
+            "y": 8.35,
+            "rotation": 90,
+            "description": "Swiadkowie / przyjaciele",
+            "isHead": true,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t14_c1",
+                    "x": 22.15,
+                    "y": 7.549999999999999,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t14_c2",
+                    "x": 22.15,
+                    "y": 8.083333333333332,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t14_c3",
+                    "x": 22.15,
+                    "y": 8.616666666666667,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t14_c4",
+                    "x": 22.15,
+                    "y": 9.15,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t14",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t15",
+            "number": 2,
+            "x": 15.600000000000001,
+            "y": 1.6,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t15_c1",
+                    "x": 14.49230769230769,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c2",
+                    "x": 14.96923076923077,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c3",
+                    "x": 15.446153846153845,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c4",
+                    "x": 15.923076923076923,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c5",
+                    "x": 16.4,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c6",
+                    "x": 14.49230769230769,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c7",
+                    "x": 14.96923076923077,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c8",
+                    "x": 15.446153846153845,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c9",
+                    "x": 15.923076923076923,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c10",
+                    "x": 16.4,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t15_c11",
+                    "x": 17.15,
+                    "y": 1.6,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t15",
+            "shortSideOption": "single"
+        },
+        {
+            "id": "t16",
+            "number": 3,
+            "x": 21.25,
+            "y": 2.85,
+            "rotation": 90,
+            "description": "Świadkowie / przyjaciele",
+            "isHead": true,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t16_c1",
+                    "x": 22.15,
+                    "y": 2.0500000000000003,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t16_c2",
+                    "x": 22.15,
+                    "y": 2.5833333333333335,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t16_c3",
+                    "x": 22.15,
+                    "y": 3.1166666666666667,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t16_c4",
+                    "x": 22.15,
+                    "y": 3.65,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t16",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t17616411885453fb3603cfade6",
+            "number": 4,
+            "x": 15.725000000000001,
+            "y": 9.25,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t17616411885453fb3603cfade6_c1",
+                    "x": 14.61730769230769,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c2",
+                    "x": 15.09423076923077,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c3",
+                    "x": 15.571153846153845,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c4",
+                    "x": 16.048076923076923,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c5",
+                    "x": 16.525,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c6",
+                    "x": 14.61730769230769,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c7",
+                    "x": 15.09423076923077,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c8",
+                    "x": 15.571153846153845,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c9",
+                    "x": 16.048076923076923,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c10",
+                    "x": 16.525,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17616411885453fb3603cfade6_c11",
+                    "x": 17.275,
+                    "y": 9.25,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t17616411885453fb3603cfade6",
+            "shortSideOption": "single"
+        },
+        {
+            "id": "t1761641188725df3cd0ec5b9b",
+            "number": 5,
+            "x": 11.125,
+            "y": 9.25,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c1",
+                    "x": 10.325,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c2",
+                    "x": 10.801923076923076,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c3",
+                    "x": 11.278846153846153,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c4",
+                    "x": 11.75576923076923,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c5",
+                    "x": 12.232692307692307,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c6",
+                    "x": 10.325,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c7",
+                    "x": 10.801923076923076,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c8",
+                    "x": 11.278846153846153,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c9",
+                    "x": 11.75576923076923,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1761641188725df3cd0ec5b9b_c10",
+                    "x": 12.232692307692307,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t17616411885453fb3603cfade6",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t176209657736375fc6145e67e88",
+            "number": 6,
+            "x": 11.125,
+            "y": 7,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t176209657736375fc6145e67e88_c1",
+                    "x": 10.325,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c2",
+                    "x": 10.801923076923076,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c3",
+                    "x": 11.278846153846153,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c4",
+                    "x": 11.75576923076923,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c5",
+                    "x": 12.232692307692307,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c6",
+                    "x": 10.325,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c7",
+                    "x": 10.801923076923076,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c8",
+                    "x": 11.278846153846153,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c9",
+                    "x": 11.75576923076923,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657736375fc6145e67e88_c10",
+                    "x": 12.232692307692307,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t176209657736375fc6145e67e88",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t176209657751450f540371a532",
+            "number": 7,
+            "x": 13.3,
+            "y": 1.6,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t176209657751450f540371a532_c1",
+                    "x": 12.584615384615384,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c2",
+                    "x": 13.061538461538461,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c3",
+                    "x": 13.538461538461538,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c4",
+                    "x": 14.015384615384615,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c5",
+                    "x": 12.584615384615384,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c6",
+                    "x": 13.061538461538461,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c7",
+                    "x": 13.538461538461538,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t176209657751450f540371a532_c8",
+                    "x": 14.015384615384615,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t15",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t1762096579690f7e6b5a5df0c88",
+            "number": 8,
+            "x": 11,
+            "y": 1.6,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c1",
+                    "x": 10.2,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c2",
+                    "x": 10.676923076923076,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c3",
+                    "x": 11.153846153846153,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c4",
+                    "x": 11.63076923076923,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c5",
+                    "x": 12.107692307692307,
+                    "y": 2.5000000000000004,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c6",
+                    "x": 10.2,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c7",
+                    "x": 10.676923076923076,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c8",
+                    "x": 11.153846153846153,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c9",
+                    "x": 11.63076923076923,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579690f7e6b5a5df0c88_c10",
+                    "x": 12.107692307692307,
+                    "y": 0.7000000000000003,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t15",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t1762096579747d9c916fdb561b",
+            "number": 9,
+            "x": 13.425,
+            "y": 7,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t1762096579747d9c916fdb561b_c1",
+                    "x": 12.709615384615384,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c2",
+                    "x": 13.186538461538461,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c3",
+                    "x": 13.663461538461538,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c4",
+                    "x": 14.140384615384615,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c5",
+                    "x": 12.709615384615384,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c6",
+                    "x": 13.186538461538461,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c7",
+                    "x": 13.663461538461538,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762096579747d9c916fdb561b_c8",
+                    "x": 14.140384615384615,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t176209657736375fc6145e67e88",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t17621108389932ac99e3a79d6",
+            "number": 10,
+            "x": 13.3,
+            "y": 4,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t17621108389932ac99e3a79d6_c1",
+                    "x": 12.584615384615384,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c2",
+                    "x": 13.061538461538461,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c3",
+                    "x": 13.538461538461538,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c4",
+                    "x": 14.015384615384615,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c5",
+                    "x": 12.584615384615384,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c6",
+                    "x": 13.061538461538461,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c7",
+                    "x": 13.538461538461538,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108389932ac99e3a79d6_c8",
+                    "x": 14.015384615384615,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t17621108389932ac99e3a79d6",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t17621108390840f91aad068ecf8",
+            "number": 11,
+            "x": 13.425,
+            "y": 9.25,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 3,
+            "chairs": [
+                {
+                    "id": "t17621108390840f91aad068ecf8_c1",
+                    "x": 12.709615384615384,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c2",
+                    "x": 13.186538461538461,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c3",
+                    "x": 13.663461538461538,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c4",
+                    "x": 14.140384615384615,
+                    "y": 10.15,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c5",
+                    "x": 12.709615384615384,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c6",
+                    "x": 13.186538461538461,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c7",
+                    "x": 13.663461538461538,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108390840f91aad068ecf8_c8",
+                    "x": 14.140384615384615,
+                    "y": 8.35,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t17616411885453fb3603cfade6",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t1762110839128d1c73f26758bb8",
+            "number": 12,
+            "x": 15.725000000000001,
+            "y": 7,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c1",
+                    "x": 14.61730769230769,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c2",
+                    "x": 15.09423076923077,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c3",
+                    "x": 15.571153846153845,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c4",
+                    "x": 16.048076923076923,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c5",
+                    "x": 16.525,
+                    "y": 7.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c6",
+                    "x": 14.61730769230769,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c7",
+                    "x": 15.09423076923077,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c8",
+                    "x": 15.571153846153845,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c9",
+                    "x": 16.048076923076923,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c10",
+                    "x": 16.525,
+                    "y": 6.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839128d1c73f26758bb8_c11",
+                    "x": 17.275,
+                    "y": 7,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t176209657736375fc6145e67e88",
+            "shortSideOption": "single"
+        },
+        {
+            "id": "t1762110839180aad2d4e9085c",
+            "number": 13,
+            "x": 15.600000000000001,
+            "y": 4,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t1762110839180aad2d4e9085c_c1",
+                    "x": 14.49230769230769,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c2",
+                    "x": 14.96923076923077,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c3",
+                    "x": 15.446153846153845,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c4",
+                    "x": 15.923076923076923,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c5",
+                    "x": 16.4,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c6",
+                    "x": 14.49230769230769,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c7",
+                    "x": 14.96923076923077,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c8",
+                    "x": 15.446153846153845,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c9",
+                    "x": 15.923076923076923,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c10",
+                    "x": 16.4,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110839180aad2d4e9085c_c11",
+                    "x": 17.15,
+                    "y": 4,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t17621108389932ac99e3a79d6",
+            "shortSideOption": "single"
+        },
+        {
+            "id": "t17621108481440283ebb04261f8",
+            "number": 14,
+            "x": 11,
+            "y": 4,
+            "rotation": 0,
+            "description": "",
+            "isHead": false,
+            "headSeatCount": 4,
+            "chairs": [
+                {
+                    "id": "t17621108481440283ebb04261f8_c1",
+                    "x": 10.2,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c2",
+                    "x": 10.676923076923076,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c3",
+                    "x": 11.153846153846153,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c4",
+                    "x": 11.63076923076923,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c5",
+                    "x": 12.107692307692307,
+                    "y": 4.9,
+                    "side": "top",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c6",
+                    "x": 10.2,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c7",
+                    "x": 10.676923076923076,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c8",
+                    "x": 11.153846153846153,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c9",
+                    "x": 11.63076923076923,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                },
+                {
+                    "id": "t17621108481440283ebb04261f8_c10",
+                    "x": 12.107692307692307,
+                    "y": 3.1,
+                    "side": "bottom",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t17621108389932ac99e3a79d6",
+            "shortSideOption": "none"
+        },
+        {
+            "id": "t1762110848173c21eb3a1588b08",
+            "number": 15,
+            "x": 21.225,
+            "y": 5.5,
+            "rotation": 90,
+            "description": "",
+            "isHead": true,
+            "headSeatCount": 2,
+            "chairs": [
+                {
+                    "id": "t1762110848173c21eb3a1588b08_c1",
+                    "x": 22.125,
+                    "y": 5.233333333333333,
+                    "side": "right",
+                    "guestId": null
+                },
+                {
+                    "id": "t1762110848173c21eb3a1588b08_c2",
+                    "x": 22.125,
+                    "y": 5.766666666666667,
+                    "side": "right",
+                    "guestId": null
+                }
+            ],
+            "groupId": "t1762110848173c21eb3a1588b08",
+            "shortSideOption": "none"
+        }
+    ],
+    "guests": [],
+    "settings": {
+        "mode": "more",
+        "tableCount": 15
+    }
+}

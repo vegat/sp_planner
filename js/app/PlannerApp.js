@@ -50,7 +50,7 @@ export class PlannerApp {
             if (local) {
                 this.state.loadFromRaw(local);
             } else {
-                this.state.createDefaultLayout();
+                await this.loadDefaultLayout();
             }
         }
         this.history.reset();
@@ -181,14 +181,23 @@ export class PlannerApp {
         this.persistLocal();
     }
 
-    resetLayout() {
+    async resetLayout() {
         if (!confirm('Czy na pewno chcesz zresetować układ sali?')) {
             return;
         }
         this.pushHistory();
-        this.state.createDefaultLayout();
+        await this.loadDefaultLayout();
         this.persistLocal();
         this.render();
+    }
+
+    async loadDefaultLayout() {
+        const defaultPlan = await this.storage.loadDefaultPlan();
+        if (defaultPlan) {
+            this.state.loadFromRaw(defaultPlan);
+        } else {
+            this.state.createDefaultLayout();
+        }
     }
 
     persistLocal() {

@@ -64,6 +64,21 @@ export class StorageService {
         }
     }
 
+    async loadDefaultPlan() {
+        try {
+            const response = await fetch('plans/default_plan.json', {
+                cache: 'no-store'
+            });
+            if (!response.ok) {
+                throw new Error('Nie udało się wczytać domyślnego planu.');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Błąd ładowania domyślnego planu', error);
+            return null;
+        }
+    }
+
     async saveRemote(state) {
         try {
             const response = await fetch('save.php', {
