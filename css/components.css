@@ -1,0 +1,228 @@
+.guest-form form {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 1rem;
+}
+
+.guest-form input {
+    flex: 1;
+    padding: 0.5rem;
+    border-radius: 6px;
+    border: 1px solid #cbd2d9;
+}
+
+.guest-form button {
+    padding: 0.5rem 1rem;
+    border: none;
+    border-radius: 6px;
+    background: #38a169;
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.guest-form button:hover {
+    background: #2f855a;
+}
+
+.guest-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.guest-list li {
+    padding: 0.5rem;
+    background: #f0f4f8;
+    border-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.95rem;
+    cursor: grab;
+    user-select: none;
+}
+
+.guest-list li .guest-name {
+    flex: 1;
+    margin-right: 0.75rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.guest-list li.assigned {
+    background: #d1fae5;
+}
+
+.guest-list li.dragging {
+    opacity: 0.6;
+    cursor: grabbing;
+}
+
+.guest-actions {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.guest-remove {
+    border: none;
+    background: #fee2e2;
+    color: #b91c1c;
+    padding: 0.25rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.guest-remove:hover {
+    background: #fecaca;
+}
+
+.guest-list li span.status {
+    font-size: 0.8rem;
+    color: #52606d;
+}
+
+.table {
+    position: absolute;
+    background: linear-gradient(135deg, #b37a45, #8a552a);
+    border: 2px solid #5e381a;
+    border-radius: 10px;
+    box-shadow: 0 4px 8px rgba(15, 23, 42, 0.18);
+    cursor: grab;
+    transition: box-shadow 0.2s, transform 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.table.selected {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35), 0 8px 16px rgba(15, 23, 42, 0.2);
+}
+
+.table.dragging {
+    cursor: grabbing;
+    box-shadow: 0 12px 20px rgba(15, 23, 42, 0.25);
+    z-index: 10;
+}
+
+.table-label {
+    display: flex;
+    flex-direction: column;
+    gap: 0.2rem;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.85);
+    color: #111827;
+    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    font-size: 0.78rem;
+    pointer-events: none;
+    max-width: calc(100% - 2rem);
+    word-break: break-word;
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.2);
+}
+
+.table-label-title {
+    font-weight: 700;
+    font-size: 0.84rem;
+    letter-spacing: 0.01em;
+}
+
+.table-label-subtitle {
+    font-size: 0.7rem;
+    color: #334155;
+}
+
+.table-head {
+    border-color: #f59e0b;
+    background: linear-gradient(135deg, #f9a94b, #d97706);
+}
+
+.table-head .table-label {
+    background: rgba(255, 255, 255, 0.92);
+    color: #78350f;
+}
+
+.table-settings {
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    width: 1.5rem;
+    height: 1.5rem;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.7);
+    color: #1f2937;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.2s;
+    box-shadow: 0 2px 6px rgba(15, 23, 42, 0.25);
+}
+
+.table-settings:hover {
+    background: rgba(255, 255, 255, 0.95);
+    transform: scale(1.05);
+}
+
+.pillar {
+    fill: #94a3b8;
+}
+
+.reference {
+    stroke: rgba(37, 99, 235, 0.75);
+    stroke-width: 2.5;
+    stroke-dasharray: 6 4;
+    filter: drop-shadow(0 2px 2px rgba(15, 23, 42, 0.2));
+}
+
+.reference text {
+    fill: #0f172a;
+    font-size: 14px;
+    font-weight: 700;
+    letter-spacing: 0.01em;
+    stroke: rgba(255, 255, 255, 0.85);
+    stroke-width: 3;
+    paint-order: stroke fill;
+}
+
+.chair {
+    position: absolute;
+    width: calc(var(--chair-size) * var(--scale) * 1px);
+    height: calc(var(--chair-size) * var(--scale) * 1px);
+    background: #e2e8f0;
+    border: 2px solid #94a3b8;
+    border-radius: calc(var(--chair-radius) * var(--scale) * 1px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.6rem;
+    color: #1f2933;
+    cursor: pointer;
+    transition: transform 0.1s, background 0.2s, border-color 0.2s;
+}
+
+.chair.drop-target {
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.35);
+}
+
+.chair.assigned {
+    background: #c7f9cc;
+    border-color: #2f855a;
+    color: #22543d;
+}
+
+.chair:hover {
+    transform: scale(1.05);
+}
